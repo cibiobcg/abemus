@@ -5,7 +5,6 @@
 #' @return A list containing 2 data frames:
 #' [[1]] Table with unique germline samples (use for GSE distribution and pbem computation steps)
 #' [[2]] Table with only case samples having a matched control sample (use for call snvs step)
-
 import_sif <- function(filesif){
   df  <-  read.delim(filesif,as.is=T,stringsAsFactors = F,header = F)
   colnames(df) <- c("patient","plasma","plasma.bam","germline","germline.bam")
