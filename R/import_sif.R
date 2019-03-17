@@ -1,6 +1,7 @@
 #' Read and check the sample info file
 #'
 #' @param filesif A tab delimeted file without header where columns are:
+#' @export
 #' @return A list containing 2 data frames:
 #' [[1]] Table with unique germline samples (use for GSE distribution and pbem computation steps)
 #' [[2]] Table with only case samples having a matched control sample (use for call snvs step)
