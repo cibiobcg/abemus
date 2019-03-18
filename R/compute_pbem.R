@@ -2,14 +2,14 @@
 #'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
-#' @param chromosomes vector of unique chromosomes to be analysed, i.e. c("chr7","chr21","chr13")
+#' @param chromosomes vector of unique chromosomes to be analysed
 #' @param sif the output [[1]] from import_sif
 #' @param targetbp folder with RData for each annotated positions
 #' @param step
 #' @param bam.with.chr
 compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
 
-  for(chrom in chromosomes){
+  for(chrom in unique(chromosomes)){
     cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
     germlineset = get_germlineset(sif)
 
@@ -19,7 +19,7 @@ compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
 
     mytargets = unique(chromTargetPositions)
     targetsFILT <- mytargets
-    #targetsFILT$randompos <- 1 # deprecated, to remove
+    targetsFILT$randompos <- 1 # deprecated, to be removed
 
     # Final targets
     targets = unique(targetsFILT)
