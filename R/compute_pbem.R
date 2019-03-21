@@ -2,16 +2,44 @@
 #'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
+#' @param sif the output [[1]] from import_sif()
 #' @param chromosomes vector of unique chromosomes to be analysed
-#' @param sif the output [[1]] from import_sif
 #' @param targetbp folder with RData for each annotated positions
-#' @param step
-#' @param bam.with.chr
-compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
+#' @param outdir output folder for this step analysis
+#' @param outdir.bperr.name folder will be created in outdir. default: "BaseErrorModel"
+#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
+#' @param bam.with.chr default: FALSE
+#' @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2
+#' @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10
+#' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
+#' @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10
+#' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
+#' @param step into how many positions to split the chrom file. default: 5000
+#' @return list(bperr, bperr_summary, bperr_tabstat)
+compute_pbem <- function(sif,
+                         chromosomes,
+                         targetbp,
+                         outdir,
+                         outdir.bperr.name = "BaseErrorModel",
+                         coverage_binning = 50,
+                         af_max_to_compute_thresholds = 0.2,
+                         coverage_min_to_compute_thresholds = 10,
+                         af_max_to_compute_pbem = 0.2,
+                         coverage_min_to_compute_pbem = 10,
+                         n_pos_af_th = 0.2,
+                         step = 5000,
+                         bam.with.chr = FALSE){
+
+  cat(paste("[",Sys.time(),"]\tComputation of per-base error model","\n"))
+
+  if(!file.exists(file.path(outdir, outdir.bperr.name))){
+    dir.create(file.path(outdir, outdir.bperr.name), showWarnings = TRUE)
+  }
+  setwd(file.path(outdir, outdir.bperr.name))
 
   for(chrom in unique(chromosomes)){
     cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
-    germlineset = get_germlineset(sif)
+    #germlineset = get_germlineset(sif)
 
     tp = list.files(targetbp,pattern = paste0(chrom,"\\.RData$"),full.names = T)
     load(tp,verbose = F)
@@ -34,11 +62,11 @@ compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
     #step = 5000
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
-             germlineset=germlineset,
+             germlineset=get_germlineset(sif),
              step=step,
              chrom=chrom,
-             lev=lev,
-             covbin=covbin,
+             covbin=define_cov_bins(coverage_binning)[[1]],
+             lev=define_cov_bins(coverage_binning)[[2]],
              af_max_to_compute_thresholds=af_max_to_compute_thresholds,
              coverage_min_to_compute_thresholds=coverage_min_to_compute_thresholds,
              af_max_to_compute_pbem=af_max_to_compute_pbem,
@@ -72,7 +100,7 @@ compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
   cmd.merge = paste("cat bperr_chr*.tsv > bperr.tsv")
   system(cmd.merge)
 
-  bperr = fread(file.path(outdir, "BaseErrorModel","bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5))
+  bperr = fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5))
 
   # summary stats for pbem across the target
   bperr_summary = summary(bperr$V22)
@@ -80,7 +108,7 @@ compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
   bperr_summary = data.frame(as.numeric(bperr_summary))
   bperr_summary = rbind(bperr_summary,sd(x = bperr$V16,na.rm = T))
   rownames(bperr_summary) = c(names,"std")
-  write.table(bperr_summary,file = file.path(outdir, "BaseErrorModel","bperr_summary.tsv"),row.names = T,col.names = F,quote = F,sep = "\t")
+  write.table(bperr_summary,file = file.path(outdir, outdir.bperr.name,"bperr_summary.tsv"),row.names = T,col.names = F,quote = F,sep = "\t")
 
   pbem.nas = which(is.na(bperr$V22))
   if(length(pbem.nas)>0){
@@ -91,9 +119,11 @@ compute_pbem <- function(chromosomes,sif,step=5000,bam.with.chr=FALSE){
   bperr_subset = bperr[which(bperr$V17 == 0),]
   bgpbem = (sum(as.numeric(bperr_subset$V23)))/(sum(as.numeric(bperr_subset$V10)))
   mean_pbem = mean(as.numeric(bperr_subset$V22),na.rm = T)
-  tabstat = data.frame(background_pbem = bgpbem,
-                       mean_pbem = mean_pbem,
-                       stringsAsFactors = F)
-  write.table(tabstat,file = file.path(outdir, "BaseErrorModel","pbem_background.tsv"),row.names = F,col.names = T,quote = F,sep = "\t")
+  bperr_tabstat = data.frame(background_pbem = bgpbem,
+                             mean_pbem = mean_pbem,
+                             stringsAsFactors = F)
+  write.table(bperr_tabstat,file = file.path(outdir, outdir.bperr.name,"pbem_background.tsv"),row.names = F,col.names = T,quote = F,sep = "\t")
+
+  return(list(bperr,bperr_summary,bperr_tabstat))
 }
 
