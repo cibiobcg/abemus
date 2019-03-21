@@ -2,9 +2,9 @@
 #'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
-#' @param sif the output [[1]] from import_sif()
-#' @param chromosomes vector of unique chromosomes to be analysed
+#' @param sample.info.file the output [[1]] from import_sif()
 #' @param targetbp folder with RData for each annotated positions
+#' @param pacbamfolder folder with pileups
 #' @param outdir output folder for this step analysis
 #' @param outdir.bperr.name folder will be created in outdir. default: "BaseErrorModel"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
@@ -14,11 +14,12 @@
 #' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
 #' @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10
 #' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
+#' @param mc.cores mc.core param from mclapply. default: 1
 #' @param step into how many positions to split the chrom file. default: 5000
 #' @return list(bperr, bperr_summary, bperr_tabstat)
-compute_pbem <- function(sif,
-                         chromosomes,
+compute_pbem <- function(sample.info.file,
                          targetbp,
+                         pacbamfolder,
                          outdir,
                          outdir.bperr.name = "BaseErrorModel",
                          coverage_binning = 50,
@@ -27,8 +28,15 @@ compute_pbem <- function(sif,
                          af_max_to_compute_pbem = 0.2,
                          coverage_min_to_compute_pbem = 10,
                          n_pos_af_th = 0.2,
+                         mc.cores = 1,
                          step = 5000,
                          bam.with.chr = FALSE){
+  cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
+  sif <- import_sif(main_sif = sample.info.file)
+
+  cat(paste("[",Sys.time(),"]\tReading chromosomes from bpcovered.tsv","\n"))
+  chromosomes = read.delim(file = file.path(targetbp,"bpcovered.tsv"),as.is=T)
+  chromosomes = sort(paste0("chr",chromosomes[-nrow(chromosomes),1]))
 
   cat(paste("[",Sys.time(),"]\tComputation of per-base error model","\n"))
 
@@ -62,7 +70,7 @@ compute_pbem <- function(sif,
     #step = 5000
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
-             germlineset=get_germlineset(sif),
+             germlineset=get_germlineset(sifgerm = sif[[1]],pacbamfolder = pacbamfolder,chrom = chrom),
              step=step,
              chrom=chrom,
              covbin=define_cov_bins(coverage_binning)[[1]],

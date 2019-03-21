@@ -4,10 +4,10 @@
 \alias{get_germlineset}
 \title{Get list of pileups for germline samples}
 \usage{
-get_germlineset(main_sif, pacbamfolder, chrom)
+get_germlineset(sifgerm, pacbamfolder, chrom)
 }
 \arguments{
-\item{main_sif}{sample info file}
+\item{sifgerm}{sample info file}
 
 \item{pacbamfolder}{folder with pileups}
 

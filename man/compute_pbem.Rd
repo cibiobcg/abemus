@@ -4,19 +4,20 @@
 \alias{compute_pbem}
 \title{Compute pbem}
 \usage{
-compute_pbem(sif, chromosomes, targetbp, outdir,
+compute_pbem(sample.info.file, targetbp, pacbamfolder, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,
   af_max_to_compute_thresholds = 0.2,
   coverage_min_to_compute_thresholds = 10,
   af_max_to_compute_pbem = 0.2, coverage_min_to_compute_pbem = 10,
-  n_pos_af_th = 0.2, step = 5000, bam.with.chr = FALSE)
+  n_pos_af_th = 0.2, mc.cores = 1, step = 5000,
+  bam.with.chr = FALSE)
 }
 \arguments{
-\item{sif}{the output [[1]] from import_sif()}
-
-\item{chromosomes}{vector of unique chromosomes to be analysed}
+\item{sample.info.file}{the output [[1]] from import_sif()}
 
 \item{targetbp}{folder with RData for each annotated positions}
+
+\item{pacbamfolder}{folder with pileups}
 
 \item{outdir}{output folder for this step analysis}
 
@@ -33,6 +34,8 @@ compute_pbem(sif, chromosomes, targetbp, outdir,
 \item{coverage_min_to_compute_pbem}{To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10}
 
 \item{n_pos_af_th}{When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2}
+
+\item{mc.cores}{mc.core param from mclapply. default: 1}
 
 \item{step}{into how many positions to split the chrom file. default: 5000}
 

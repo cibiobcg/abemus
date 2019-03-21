@@ -4,10 +4,10 @@
 \alias{import_sif}
 \title{Read and check the sample info file}
 \usage{
-import_sif(filesif)
+import_sif(main_sif)
 }
 \arguments{
-\item{filesif}{A tab delimeted file without header where columns are:}
+\item{main_sif}{A tab delimeted file without header where columns are: c("patient","plasma","plasma.bam","germline","germline.bam")}
 }
 \value{
 A list containing 2 data frames:
