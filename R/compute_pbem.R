@@ -47,7 +47,6 @@ compute_pbem <- function(sample.info.file,
 
   for(chrom in unique(chromosomes)){
     cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
-    #germlineset = get_germlineset(sif)
 
     tp = list.files(targetbp,pattern = paste0(chrom,"\\.RData$"),full.names = T)
     load(tp,verbose = F)
@@ -66,8 +65,7 @@ compute_pbem <- function(sample.info.file,
       targets$chr = paste0('chr',targets$chr)
     }
 
-    cat(paste("[",Sys.time(),"]\tTotal positions to check in this chromosome :",nrow(targets)),"\n")
-    #step = 5000
+    cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
              germlineset=get_germlineset(sifgerm = sif[[1]],pacbamfolder = pacbamfolder,chrom = chrom),
@@ -91,7 +89,6 @@ compute_pbem <- function(sample.info.file,
     cmdc = paste("cat *_afz.table.txt >",paste0("afz_",chrom,".tsv"))
     system(cmdc)
     system("rm *_afz.table.txt")
-
   }
   cmd.merge = paste("cat afgtz_chr*.tsv > afgtz.tsv")
   system(cmd.merge)
@@ -101,13 +98,12 @@ compute_pbem <- function(sample.info.file,
   # save counter of afz as RData
   afztab = read.delim(file = "afz.tsv",sep="\t",as.is = T,header=F)
   afz = apply(afztab,2,sum)
-  names(afz)=lev
+  names(afz)=define_cov_bins(coverage_binning)[[2]]
   save(afz,file = "afz.RData",compress = T)
 
   # overall statistics on pbems
   cmd.merge = paste("cat bperr_chr*.tsv > bperr.tsv")
   system(cmd.merge)
-
   bperr = fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5))
 
   # summary stats for pbem across the target
@@ -117,11 +113,6 @@ compute_pbem <- function(sample.info.file,
   bperr_summary = rbind(bperr_summary,sd(x = bperr$V16,na.rm = T))
   rownames(bperr_summary) = c(names,"std")
   write.table(bperr_summary,file = file.path(outdir, outdir.bperr.name,"bperr_summary.tsv"),row.names = T,col.names = F,quote = F,sep = "\t")
-
-  pbem.nas = which(is.na(bperr$V22))
-  if(length(pbem.nas)>0){
-    warning("NOT ABLE TO COMPUTE PBEM IN ",length(pbem.nas)," POSITIONS.")
-  }
 
   # compute background pbem
   bperr_subset = bperr[which(bperr$V17 == 0),]
