@@ -23,7 +23,7 @@ compute_afthreshold <- function(outdir,
   afz_file = file.path(pbem_dir,"afz.RData")
 
   #  check if data tables exists
-  if(file.exists(file.path(pbem_dir,"afgtz.tsv"))){
+  if(file.exists(vafcov_file)){
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"),"\n")
     #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
     vafcov = fread(input = vafcov_file,sep = "\t",header = F,stringsAsFactors = F,data.table = F)
@@ -32,7 +32,7 @@ compute_afthreshold <- function(outdir,
     quit()
   }
 
-  if(file.exists(file.path(pbem_dir,"afz.RData"))){
+  if(file.exists(afz_file)){
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ ok ]"),"\n")
     load(afz_file)
   } else {
