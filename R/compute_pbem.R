@@ -2,7 +2,7 @@
 #'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
-#' @param sample.info.file the output [[1]] from import_sif()
+#' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbp folder with RData for each annotated positions
 #' @param pacbamfolder folder with pileups
 #' @param outdir output folder for this step analysis

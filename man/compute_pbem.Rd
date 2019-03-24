@@ -13,7 +13,7 @@ compute_pbem(sample.info.file, targetbp, pacbamfolder, outdir,
   bam.with.chr = FALSE)
 }
 \arguments{
-\item{sample.info.file}{the output [[1]] from import_sif()}
+\item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
 
 \item{targetbp}{folder with RData for each annotated positions}
 
