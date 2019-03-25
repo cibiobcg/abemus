@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param outdir output folder for this step analysis
-#' @param pbem_dir folder with pbem data. default: "outdir/BaseErrorModel"
+#' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
 #' @param outdir.afth.name folder will be created in outdir. default: "Controls"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param probs quatiles to compute
