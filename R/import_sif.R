@@ -1,7 +1,6 @@
 #' Read and check the sample info file
 #'
 #' @param main_sif A tab delimeted file without header where columns are: c("patient","plasma","plasma.bam","germline","germline.bam")
-#' @export
 #' @return A list containing 2 data frames:
 #' [[1]] Table with unique germline samples (use for GSE distribution and pbem computation steps)
 #' [[2]] Table with only case samples having a matched control sample (use for call snvs step)
