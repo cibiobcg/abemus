@@ -3,11 +3,19 @@
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbp folder with RData for each annotated positions
 #' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
+#' @param mincov Minimum locus coverage in case sample
+#' @param minalt Minimum number of reads supporting the alternative allele in case sample
+#' @param mincovgerm Minimum locus coverage in germline sample
+#' @param maxafgerm Maximum allelic fraction observed in matched germline locus
 #' @param outdir output folder for this step analysis
 #' @param outdir.calls.name folder will be created in outdir. default: "Results"
+#' @param AFbycov AFbycov=TRUE apply afth coverage based; AFbycov=FALSE apply afth not-coverage based; AF=as.numeric(x) custom afth i.e. x = 0.05
+#' @param pacbamfolder folder with pileups
+#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @export
 callsnvs <- function(sample.info.file,
                      targetbp,
+                     pacbamfolder,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
                      PBEsim = "~/datasetoy/RData/PBEsim.RData",
                      AFbycov = TRUE,
@@ -16,6 +24,7 @@ callsnvs <- function(sample.info.file,
                      mincovgerm = 10,
                      minalt = 1,
                      maxafgerm = 0.2,
+                     coverage_binning = 50,
                      outdir,
                      outdir.calls.name="Results"){
 
@@ -31,8 +40,7 @@ callsnvs <- function(sample.info.file,
     dir.create(file.path(outdir, outdir.calls.name), showWarnings = T)
   }
 
-  # Apply filters to define a set of putative SNVs
-  cat(paste("[",Sys.time(),"]\tApply basic filters"),"\n")
+  # summary of thresholds applied
   fpam = data.frame(AFbycov = as.character(AFbycov),
                     spec = as.character(minaf_cov_corrected[1,1]),
                     mincov = as.character(mincov),
@@ -65,7 +73,7 @@ callsnvs <- function(sample.info.file,
     out3 = paste0("pmtab_F3_",name.plasma,".tsv")
     # create patient sub-folder
     patient_folder = file.path(outdir, outdir.calls.name, name.patient)
-    dir.create(patient_folder)
+    dir.create(patient_folder,showWarnings = T)
     germline.folder = list.files(pacbamfolder, pattern = paste0(name.germline,"$"),full.names = T)
     if(length(germline.folder)==0){
       message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder, name.germline))
@@ -113,8 +121,5 @@ callsnvs <- function(sample.info.file,
       cat(file = "f3_table_WARNING.txt","No calls found in chrpm_f3.tsv")
     }
   }
-
-
-
 
 }
