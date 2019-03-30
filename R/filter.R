@@ -6,10 +6,25 @@ filter = function(i,
                   patient_folder,
                   plasma.folder,
                   germline.folder,
+                  name.patient,
+                  name.plasma,
+                  name.germline,
+                  pbem_dir,
                   out1,
                   out2,
                   out3,
-                  coverage_binning=50){
+                  mincov,
+                  minalt,
+                  mincovgerm,
+                  maxafgerm,
+                  AFbycov,
+                  minaf_cov_corrected,
+                  xbg,
+                  tab_cov_pbem,
+                  afs,
+                  covs,
+                  coverage_binning,
+                  njobs = 1){
   chrom = chromosomes[i]
   # create chromsome sub-folder
   chromdir = file.path(patient_folder,chrom)
@@ -32,7 +47,7 @@ filter = function(i,
   out <-  mclapply(seq(1,nrow(snvs),1),
                    CheckAltReads,
                    snvs=snvs,
-                   mc.cores = mc.cores)
+                   mc.cores = njobs)
   snvs <- fromListToDF(out)
   snvs <- snvs[which(snvs$af > 0 ),,drop=F]
   snvs <- snvs[which(snvs$cov >= mincov ),,drop=F]
@@ -65,14 +80,17 @@ filter = function(i,
     # import pbem of this chrom
     tabpbem_file = list.files(pbem_dir, pattern = paste0('bperr_',chrom,'.tsv'),full.names = T)
     tabpbem = fread(input = tabpbem_file,stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5),data.table = F)
-    colnames(tabpbem) <- c("group","chr","pos","ref","dbsnp","gc","map","uniq","is_rndm","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available",'n_pos_af_lth','n_pos_af_gth','count.A_af_gth','count.C_af_gth','count.G_af_gth','count.T_af_gth',"bperr","tot_reads_supporting_alt")
+    colnames(tabpbem) <- c("group","chr","pos","ref","dbsnp","gc","map","uniq","is_rndm",
+                           "tot_coverage","total.A","total.C","total.G","total.T",
+                           "n_pos_available",'n_pos_af_lth','n_pos_af_gth','count.A_af_gth','count.C_af_gth','count.G_af_gth','count.T_af_gth',
+                           "bperr","tot_reads_supporting_alt")
     # TABLE 1
     chrpmF1 = apply_AF_filters(chrpmF1=putsnvs,
                                AFbycov=AFbycov,
                                mybreaks=define_cov_bins(coverage_binning)[[1]],
                                af.threshold.table=minaf_cov_corrected,
-                               minaf=minaf,
-                               mc.cores=mc.cores)
+                               minaf=NA,
+                               mc.cores=njobs)
     chrpmF1 = chrpmF1[,c("chr","pos","ref","alt","A_case","C_case","G_case","T_case",
                          "af_case","cov_case","Ars","Crs","Grs","Trs","rev.ref","fwd.ref","cov.alt","rev.alt","fwd.alt",
                          "strandbias","A_control","C_control","G_control","T_control","af_control","cov_control","af_threshold")]
@@ -101,7 +119,7 @@ filter = function(i,
     out = mclapply(seq(1,nrow(cpmf1),1),
                    compute_pbem_allele,
                    abemus=cpmf1,
-                   mc.cores = mc.cores)
+                   mc.cores = njobs)
     cpmf1 = fromListToDF(out)
 
     # add CLASS standard
@@ -113,10 +131,11 @@ filter = function(i,
     if(nrow(cpmf2)==0){
       return()
     }
-    cpmf2$af_threshold[which(cpmf2$af_threshold == -1)] <- NA
+    #cpmf2$af_threshold[which(cpmf2$af_threshold == -1)] <- NA
 
     # TABLE 3
-    cpmf3 = add_class_xbg(pmtab = cpmf2,xbg = as.numeric(tab_bg_pbem$background_pbem))
+    # add CLASS background pbem
+    cpmf3 = add_class_xbg(pmtab = cpmf2,xbg = xbg)
     cpmf3$bperr[which(cpmf3$bperr > 0.2)] = 0.2
     cpmf3$bperr[which(is.na(cpmf3$bperr))] = 0.2 # assign high pbem if it is NA
     if(nrow(cpmf3)>0){

@@ -130,6 +130,6 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
   cat(paste("[",Sys.time(),"]\tsaving corrected table"),"\n")
   name.out = paste0("minaf_cov_corrected_",replicas,"r_",detection.specificity,"_b.RData")
   save(minaf_cov_corrected,file = file.path(controls_dir,name.out))
-
-  return(list(tab,minaf_cov_corrected))
+  cat(paste("[",Sys.time(),"]\tAlright.","\n"))
+  return(list(info.tab=tab,minaf_cov_corrected=minaf_cov_corrected))
 }

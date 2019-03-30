@@ -3,13 +3,15 @@
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbp folder with RData for each annotated positions
 #' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
-#' @param mincov Minimum locus coverage in case sample
-#' @param minalt Minimum number of reads supporting the alternative allele in case sample
-#' @param mincovgerm Minimum locus coverage in germline sample
-#' @param maxafgerm Maximum allelic fraction observed in matched germline locus
+#' @param minaf_cov_corrected the output of adjust_af_threshold_table()
+#' @param PBEsim default: "~/datasetoy/RData/PBEsim.RData"
+#' @param mincov Minimum locus coverage in case sample. default: 10
+#' @param minalt Minimum number of reads supporting the alternative allele in case sample. default: 1
+#' @param mincovgerm Minimum locus coverage in germline sample. default: 10
+#' @param maxafgerm Maximum allelic fraction observed in matched germline locus. default: 0.2
 #' @param outdir output folder for this step analysis
 #' @param outdir.calls.name folder will be created in outdir. default: "Results"
-#' @param AFbycov AFbycov=TRUE apply afth coverage based; AFbycov=FALSE apply afth not-coverage based; AF=as.numeric(x) custom afth i.e. x = 0.05
+#' @param AFbycov Apply afth coverage based. default: AFbycov=TRUE
 #' @param pacbamfolder folder with pileups
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @export
@@ -53,13 +55,11 @@ callsnvs <- function(sample.info.file,
 
   # Import background pbem
   tab_bg_pbem = read.delim(file = file.path(pbem_dir, "pbem_background.tsv"),as.is=T,header=T,stringsAsFactors = F)
+  xbg <- as.numeric(tab_bg_pbem$background_pbem)
 
   # Import matrix for coverages and pbem
   load(PBEsim)
   tab_cov_pbem = tab.list[[6]]
-
-  chrom.in.parallel = 1 # to be corrected
-  mc.cores = 1 # to be corrected
 
   TableSif <- sif[[2]]
   for(id in 1:nrow(TableSif)){
@@ -86,15 +86,31 @@ callsnvs <- function(sample.info.file,
     }
 
     # run in parallel on chromosomes
+    chrom.in.parallel = 1 # to be corrected
     mclapply(seq(1,length(chromosomes),1),
              filter,
+             name.patient=name.patient,
+             name.plasma=name.plasma,
+             name.germline=name.germline,
              chromosomes=chromosomes,
              patient_folder=patient_folder,
              plasma.folder=plasma.folder,
              germline.folder=germline.folder,
+             pbem_dir=pbem_dir,
              out1=out1,
              out2=out2,
              out3=out3,
+             mincov=mincov,
+             minalt=minalt,
+             mincovgerm=mincovgerm,
+             maxafgerm=maxafgerm,
+             AFbycov=AFbycov,
+             minaf_cov_corrected=minaf_cov_corrected,
+             coverage_binning=coverage_binning,
+             xbg=xbg,
+             tab_cov_pbem=tab_cov_pbem,
+             afs=afs,
+             covs=covs,
              mc.cores = chrom.in.parallel)
 
     # collapse all chromosome outs into a single table
@@ -121,5 +137,5 @@ callsnvs <- function(sample.info.file,
       cat(file = "f3_table_WARNING.txt","No calls found in chrpm_f3.tsv")
     }
   }
-
+  cat(paste("[",Sys.time(),"]\tAlright.","\n"))
 }
