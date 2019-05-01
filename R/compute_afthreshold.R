@@ -2,7 +2,7 @@
 #'
 #' @export
 #' @param outdir output folder for this step analysis
-#' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
+#' @param pbem_dir folder with pbem data. default: file.path(outdir, "BaseErrorModel")
 #' @param outdir.afth.name folder will be created in outdir. default: "Controls"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param probs quatiles to compute
@@ -29,7 +29,7 @@ compute_afthreshold <- function(outdir,
     vafcov = fread(input = vafcov_file,sep = "\t",header = F,stringsAsFactors = F,data.table = F)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
-    quit()
+    stop()
   }
 
   if(file.exists(afz_file)){
@@ -37,7 +37,7 @@ compute_afthreshold <- function(outdir,
     load(afz_file)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"),"\n")
-    quit()
+    stop()
   }
 
   cat(paste("[",Sys.time() ,"]\taf.all",dim(vafcov)[1] + sum(afz),"af.gtz",dim(vafcov)[1],"af.etz",sum(afz)),"\n")
@@ -72,5 +72,9 @@ compute_afthreshold <- function(outdir,
   cat(paste("[",Sys.time(),"]\tSaving threshold data\n"))
   #save(minaf,minaf_cov,th_results,th_results_bin,covbin,lev,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
   save(th_results,th_results_bin,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
-  return(list(th_results,th_results_bin,datacount_bin))
+
+  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  return(list(th_results=th_results,
+              th_results_bin=th_results_bin,
+              datacount_bin=datacount_bin))
 }
