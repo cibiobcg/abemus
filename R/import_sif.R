@@ -9,7 +9,7 @@ import_sif <- function(main_sif){
   colnames(df) <- c("patient","plasma","plasma.bam","germline","germline.bam")
   # remove NAs and keep only unique germline samples
   df_ctrl = df[which(!is.na(df$germline.bam)),]
-  df_ctrl = unique(df_ctrl[,c(1,4,5)])
+  df_ctrl = unique(df_ctrl[,c(4,5)])
   # remove NAs and keep only case samples having matched germline samples
   nas = which(is.na(df$plasma.bam) | is.na(df$germline.bam))
   if(length(nas)>0){df_cases = df[-nas,]}
