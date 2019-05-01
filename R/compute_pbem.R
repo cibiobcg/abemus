@@ -123,6 +123,7 @@ compute_pbem <- function(sample.info.file,
                              stringsAsFactors = F)
   write.table(bperr_tabstat,file = file.path(outdir, outdir.bperr.name,"pbem_background.tsv"),row.names = F,col.names = T,quote = F,sep = "\t")
 
+  cat(paste("[",Sys.time(),"]\talright.","\n"))
   return(list(bperr=bperr,
               bperr_summary=bperr_summary,
               bperr_tabstat=bperr_tabstat))
