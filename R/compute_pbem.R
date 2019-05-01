@@ -123,6 +123,13 @@ compute_pbem <- function(sample.info.file,
                              stringsAsFactors = F)
   write.table(bperr_tabstat,file = file.path(outdir, outdir.bperr.name,"pbem_background.tsv"),row.names = F,col.names = T,quote = F,sep = "\t")
 
+  header.bperr <- c("group","chr","pos","ref","dbsnp","gc","map","uniq","is_rndm",
+                    "tot_coverage","total.A","total.C","total.G","total.T",
+                    "n_pos_available","n_pos_af_lth","n_pos_af_gth",
+                    "count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth",
+                    "bperr","tot_reads_supporting_alt")
+  colnames( bperr ) <- header.bperr
+  rownames( bperr ) <- bperr$group
   cat(paste("[",Sys.time(),"]\talright.","\n"))
   return(list(bperr=bperr,
               bperr_summary=bperr_summary,
