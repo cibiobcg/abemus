@@ -4,10 +4,11 @@
 \alias{filter}
 \title{filter}
 \usage{
-filter(i, chromosomes, patient_folder, plasma.folder, germline.folder,
-  name.patient, name.plasma, name.germline, pbem_dir, out1, out2, out3,
-  mincov, minalt, mincovgerm, maxafgerm, AFbycov, minaf_cov_corrected, xbg,
-  tab_cov_pbem, afs, covs, coverage_binning, njobs = 1)
+filter(i, chromosomes, caseout_folder = caseout_folder, plasma.folder,
+  germline.folder, name.patient, name.plasma, name.germline, pbem_dir,
+  out1, out2, out3, mincov, minalt, mincovgerm, maxafgerm, AFbycov,
+  minaf_cov_corrected, xbg, tab_cov_pbem, afs, covs, coverage_binning,
+  njobs = 1)
 }
 \arguments{
 \item{coverage_binning}{Bins of coverage into which divide allelic fractions. default: 50}

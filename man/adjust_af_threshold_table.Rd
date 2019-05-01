@@ -7,20 +7,23 @@
 adjust_af_threshold_table(controls_dir = file.path(outdir, "Controls"),
   pbem_dir = file.path(outdir, "BaseErrorModel"),
   detection.specificity = 0.995, replicas = 10,
-  replicas.in.parallel = 1, coverage_binning = 50)
+  replicas.in.parallel = 1, coverage_binning = 50,
+  coeffvar.threshold = 0.01)
 }
 \arguments{
-\item{controls_dir}{folder with afth data. default: "outdir/Controls"}
+\item{controls_dir}{folder with afth data. default: file.path(outdir,"Controls")}
 
-\item{pbem_dir}{folder with pbem data. default: "outdir/BaseErrorModel"}
+\item{pbem_dir}{folder with pbem data. default: file.path(outdir,"BaseErrorModel")}
 
 \item{detection.specificity}{default: 0.995}
 
-\item{replicas}{default: 10}
+\item{replicas}{default: 1000}
 
 \item{replicas.in.parallel}{default: 1}
 
 \item{coverage_binning}{Bins of coverage into which divide allelic fractions. default: 50}
+
+\item{coeffvar.threshold}{Consider a bin as stable if the Coeff of variations after n replicas is lower than coeffvar.threshold. default: 0.01}
 }
 \value{
 corrected af threshold table

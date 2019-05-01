@@ -9,7 +9,7 @@ callsnvs(sample.info.file, targetbp, pacbamfolder,
   PBEsim = "~/datasetoy/RData/PBEsim.RData", AFbycov = TRUE,
   minaf_cov_corrected, mincov = 10, mincovgerm = 10, minalt = 1,
   maxafgerm = 0.2, coverage_binning = 50, outdir,
-  outdir.calls.name = "Results")
+  outdir.calls.name = "Results", chrom.in.parallel = 1)
 }
 \arguments{
 \item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
@@ -39,6 +39,8 @@ callsnvs(sample.info.file, targetbp, pacbamfolder,
 \item{outdir}{output folder for this step analysis}
 
 \item{outdir.calls.name}{folder will be created in outdir. default: "Results"}
+
+\item{chrom.in.parallel}{number of chromosomes to run in parallel. default: 1}
 }
 \description{
 callsnvs

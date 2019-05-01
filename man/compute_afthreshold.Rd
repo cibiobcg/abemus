@@ -11,7 +11,7 @@ compute_afthreshold(outdir, pbem_dir = file.path(outdir,
 \arguments{
 \item{outdir}{output folder for this step analysis}
 
-\item{pbem_dir}{folder with pbem data. default: file.path(outdir, BaseErrorModel)}
+\item{pbem_dir}{folder with pbem data. default: file.path(outdir, "BaseErrorModel")}
 
 \item{outdir.afth.name}{folder will be created in outdir. default: "Controls"}
 
