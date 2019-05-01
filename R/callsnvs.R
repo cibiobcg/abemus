@@ -14,6 +14,7 @@
 #' @param AFbycov Apply afth coverage based. default: AFbycov=TRUE
 #' @param pacbamfolder folder with pileups
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
+#' @param chrom.in.parallel number of chromosomes to run in parallel. default: 1
 #' @export
 callsnvs <- function(sample.info.file,
                      targetbp,
@@ -28,7 +29,8 @@ callsnvs <- function(sample.info.file,
                      maxafgerm = 0.2,
                      coverage_binning = 50,
                      outdir,
-                     outdir.calls.name="Results"){
+                     outdir.calls.name="Results",
+                     chrom.in.parallel=1){
 
   cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
   sif <- import_sif(main_sif = sample.info.file)
@@ -71,29 +73,29 @@ callsnvs <- function(sample.info.file,
     out1 = paste0("pmtab_F1_",name.plasma,".tsv")
     out2 = paste0("pmtab_F2_",name.plasma,".tsv")
     out3 = paste0("pmtab_F3_",name.plasma,".tsv")
-    # create patient sub-folder
-    patient_folder = file.path(outdir, outdir.calls.name, name.patient)
-    dir.create(patient_folder,showWarnings = T)
+    # create sub-folder to save outputs per each case
+    caseout_folder = file.path(outdir, outdir.calls.name, name.plasma)
+    dir.create(caseout_folder,showWarnings = T)
+
     germline.folder = list.files(pacbamfolder, pattern = paste0(name.germline,"$"),full.names = T)
     if(length(germline.folder)==0){
       message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder, name.germline))
-      quit()
+      stop()
     }
     plasma.folder = list.files(pacbamfolder, pattern = paste0(name.plasma,"$"),full.names = T)
     if(length(plasma.folder)==0){
       message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder, name.plasma))
-      quit()
+      stop()
     }
 
     # run in parallel on chromosomes
-    chrom.in.parallel = 1 # to be corrected
     mclapply(seq(1,length(chromosomes),1),
              filter,
              name.patient=name.patient,
              name.plasma=name.plasma,
              name.germline=name.germline,
              chromosomes=chromosomes,
-             patient_folder=patient_folder,
+             caseout_folder=caseout_folder,
              plasma.folder=plasma.folder,
              germline.folder=germline.folder,
              pbem_dir=pbem_dir,
@@ -114,22 +116,22 @@ callsnvs <- function(sample.info.file,
              mc.cores = chrom.in.parallel)
 
     # collapse all chromosome outs into a single table
-    setwd(patient_folder)
-    tabs_list = list.files(patient_folder,full.names = T,recursive = T,pattern = 'chrpm_f1.tsv')
+    setwd(caseout_folder)
+    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f1.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out1)
       system(cmd)
     } else {
       cat(file = "f1_table_WARNING.txt","No calls found in chrpm_f1.tsv")
     }
-    tabs_list = list.files(patient_folder,full.names = T,recursive = T,pattern = 'chrpm_f2.tsv')
+    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f2.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out2)
       system(cmd)
     } else {
       cat(file = "f2_table_WARNING.txt","No calls found in chrpm_f2.tsv")
     }
-    tabs_list = list.files(patient_folder,full.names = T,recursive = T,pattern = 'chrpm_f3.tsv')
+    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f3.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out3)
       system(cmd)
@@ -137,5 +139,12 @@ callsnvs <- function(sample.info.file,
       cat(file = "f3_table_WARNING.txt","No calls found in chrpm_f3.tsv")
     }
   }
-  cat(paste("[",Sys.time(),"]\tAlright.","\n"))
+
+  # summary table index for calls
+  tabsnvs_index <- get_tabcalls_path(TableSif = TableSif,
+                                     outdir = outdir,
+                                     outdir.calls.name = outdir.calls.name)
+
+  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  return(tabsnvs_index)
 }
