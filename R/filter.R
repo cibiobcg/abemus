@@ -3,7 +3,7 @@
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 filter = function(i,
                   chromosomes,
-                  patient_folder,
+                  caseout_folder=caseout_folder,
                   plasma.folder,
                   germline.folder,
                   name.patient,
@@ -27,7 +27,7 @@ filter = function(i,
                   njobs = 1){
   chrom = chromosomes[i]
   # create chromsome sub-folder
-  chromdir = file.path(patient_folder,chrom)
+  chromdir = file.path(caseout_folder,chrom)
   dir.create(chromdir,showWarnings = T)
   setwd(chromdir)
   # import files
@@ -62,7 +62,7 @@ filter = function(i,
   cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
   system(cmd)
   ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = F,showProgress = T,header = F,na.strings = "",colClasses = list(character=10))
-  #system("rm postogrep.txt filtered.germline.pileup.txt")
+  system("rm postogrep.txt filtered.germline.pileup.txt")
   ctrl.pileup = ctrl.pileup[,1:9]
   ctrl.pileup = unique(ctrl.pileup)
   ctrl.pileup = data.frame(ctrl.pileup)
@@ -131,13 +131,15 @@ filter = function(i,
     if(nrow(cpmf2)==0){
       return()
     }
-    #cpmf2$af_threshold[which(cpmf2$af_threshold == -1)] <- NA
 
     # TABLE 3
     # add CLASS background pbem
     cpmf3 = add_class_xbg(pmtab = cpmf2,xbg = xbg)
     cpmf3$bperr[which(cpmf3$bperr > 0.2)] = 0.2
-    cpmf3$bperr[which(is.na(cpmf3$bperr))] = 0.2 # assign high pbem if it is NA
+    cpmf3$bperr[which(is.na(cpmf3$bperr))] = 0.2 # assign the highest pbem if it is NA
+
+    covs[which.max(covs)] <- Inf # define as max coverage to avoid NA values
+
     if(nrow(cpmf3)>0){
       pbem_coverage_filter = sapply(1:nrow(cpmf3), function(k) tab_cov_pbem[min(which(covs>=cpmf3$cov_case[k])),min(which(afs>=cpmf3$bperr[k]))])
       cpmf3$filter.pbem_coverage <- pbem_coverage_filter
@@ -149,9 +151,9 @@ filter = function(i,
     write.table(cpmf1,file = 'chrpm_f1.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
     write.table(cpmf2,file = 'chrpm_f2.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
     write.table(cpmf3,file = 'chrpm_f3.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
-    cat(paste(colnames(cpmf1),collapse='\t'),file = file.path(patient_folder,out1),sep = '\n')
-    cat(paste(colnames(cpmf2),collapse='\t'),file = file.path(patient_folder,out2),sep = '\n')
-    cat(paste(colnames(cpmf3),collapse='\t'),file = file.path(patient_folder,out3),sep = '\n')
+    cat(paste(colnames(cpmf1),collapse='\t'),file = file.path(caseout_folder,out1),sep = '\n')
+    cat(paste(colnames(cpmf2),collapse='\t'),file = file.path(caseout_folder,out2),sep = '\n')
+    cat(paste(colnames(cpmf3),collapse='\t'),file = file.path(caseout_folder,out3),sep = '\n')
   } else {
     return()
   }
