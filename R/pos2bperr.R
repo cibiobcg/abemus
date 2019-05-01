@@ -85,5 +85,5 @@ pos2bperr = function(id,
       write.table(tabstats,file = taboutchrom,append = F,quote = F,row.names = F,col.names = F,sep="\t")
     }
   }
-  #system(paste("rm",filtpileup,outfile))
+  system(paste("rm",filtpileup,outfile))
 }
