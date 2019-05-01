@@ -146,5 +146,5 @@ callsnvs <- function(sample.info.file,
                                      outdir.calls.name = outdir.calls.name)
 
   cat(paste("[",Sys.time(),"]\talright.","\n"))
-  return(tabsnvs_index)
+  return(list(tabsnvs_index=tabsnvs_index))
 }
