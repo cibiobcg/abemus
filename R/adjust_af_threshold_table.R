@@ -1,19 +1,21 @@
 #' adjust_af_threshold_table
 #'
 #' @export
-#' @param controls_dir folder with afth data. default: "outdir/Controls"
-#' @param pbem_dir folder with pbem data. default: "outdir/BaseErrorModel"
+#' @param controls_dir folder with afth data. default: file.path(outdir,"Controls")
+#' @param pbem_dir folder with pbem data. default: file.path(outdir,"BaseErrorModel")
 #' @param detection.specificity default: 0.995
-#' @param replicas default: 10
+#' @param replicas default: 1000
 #' @param replicas.in.parallel default: 1
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
+#' @param coeffvar.threshold Consider a bin as stable if the Coeff of variations after n replicas is lower than coeffvar.threshold. default: 0.01
 #' @return corrected af threshold table
 adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"),
                                       pbem_dir = file.path(outdir,"BaseErrorModel"),
                                       detection.specificity=0.995,
                                       replicas=10,
                                       replicas.in.parallel=1,
-                                      coverage_binning=50){
+                                      coverage_binning=50,
+                                      coeffvar.threshold=0.01){
 
   dthdataFile <- file.path(controls_dir,"datathreshold.RData")
   if(file.exists(dthdataFile)){
@@ -21,7 +23,7 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
     load(file = dthdataFile)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for",dthdataFile,"[ not found ]"),"\n")
-    quit()
+    stop()
   }
 
   vafcov_file = file.path(pbem_dir,"afgtz.tsv")
@@ -31,7 +33,7 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
     vafcov = fread(input = vafcov_file,sep = "\t",header = F,stringsAsFactors = F,data.table = F)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
-    quit()
+    stop()
   }
 
   afz_file = file.path(pbem_dir,"afz.RData")
@@ -40,7 +42,7 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
     load(afz_file)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"),"\n")
-    quit()
+    stop()
   }
 
   # Find out most represented bin of coverage
@@ -85,7 +87,7 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
         }
         x = data.frame(current.bin=current.bin,next.bin=next.bin,coeffvar=as.numeric(coeffvar),median.afth=median(ReplicasTable,na.rm = T),last.stable.card=last.stable.card,stringsAsFactors = F)
         tab=rbind(tab,x)
-        if(coeffvar > 0.01){
+        if(coeffvar > coeffvar.threshold){
           last.stable.card = max(last.stable.card,next.bin.card)
           break
         }
@@ -121,15 +123,19 @@ adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"
   }
 
   minaf_cov_corrected[which(is.na(minaf_cov_corrected))] <- last.afth.used
-  minaf_cov_corrected[which(minaf_cov_corrected==1)] <- NA
+
+  #minaf_cov_corrected[which(minaf_cov_corrected==1)] <- NA #
+  minaf_cov_corrected[which(minaf_cov_corrected==1)] <- as.numeric(minaf_cov_corrected[which(minaf_cov_corrected!=1)[2]])
 
   # correct the AF threhsold in bin where there is Inf as limit
   N = length(minaf_cov_corrected)
   minaf_cov_corrected[N] <- minaf_cov_corrected[N-1]
 
   cat(paste("[",Sys.time(),"]\tsaving corrected table"),"\n")
-  name.out = paste0("minaf_cov_corrected_",replicas,"r_",detection.specificity,"_b.RData")
+  name.out = paste0("minaf_cov_corrected_",replicas,"r_",detection.specificity,"_b.RData") # _b annotation, to be removed
   save(minaf_cov_corrected,file = file.path(controls_dir,name.out))
-  cat(paste("[",Sys.time(),"]\tAlright.","\n"))
-  return(list(info.tab=tab,minaf_cov_corrected=minaf_cov_corrected))
+
+  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  return(list(info.tab=tab,
+              minaf_cov_corrected=minaf_cov_corrected))
 }
