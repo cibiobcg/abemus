@@ -12,13 +12,13 @@
 #' @param outdir output folder for this step analysis
 #' @param outdir.calls.name folder will be created in outdir. default: "Results"
 #' @param AFbycov Apply afth coverage based. default: AFbycov=TRUE
-#' @param pacbamfolder folder with pileups
+#' @param pacbamfolder_bychrom folder with pileups
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param chrom.in.parallel number of chromosomes to run in parallel. default: 1
 #' @export
 callsnvs <- function(sample.info.file,
                      targetbp,
-                     pacbamfolder,
+                     pacbamfolder_bychrom,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
                      PBEsim = "~/datasetoy/RData/PBEsim.RData",
                      AFbycov = TRUE,
@@ -77,14 +77,14 @@ callsnvs <- function(sample.info.file,
     caseout_folder = file.path(outdir, outdir.calls.name, name.plasma)
     dir.create(caseout_folder,showWarnings = T)
 
-    germline.folder = list.files(pacbamfolder, pattern = paste0(name.germline,"$"),full.names = T)
+    germline.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.germline,"$"),full.names = T)
     if(length(germline.folder)==0){
-      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder, name.germline))
+      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.germline))
       stop()
     }
-    plasma.folder = list.files(pacbamfolder, pattern = paste0(name.plasma,"$"),full.names = T)
+    plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
     if(length(plasma.folder)==0){
-      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder, name.plasma))
+      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
       stop()
     }
 

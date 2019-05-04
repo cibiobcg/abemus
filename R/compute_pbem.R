@@ -4,7 +4,7 @@
 #' @export
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbp folder with RData for each annotated positions
-#' @param pacbamfolder folder with pileups
+#' @param pacbamfolder_bychrom folder with pileups
 #' @param outdir output folder for this step analysis
 #' @param outdir.bperr.name folder will be created in outdir. default: "BaseErrorModel"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
@@ -19,7 +19,7 @@
 #' @return list(bperr, bperr_summary, bperr_tabstat)
 compute_pbem <- function(sample.info.file,
                          targetbp,
-                         pacbamfolder,
+                         pacbamfolder_bychrom,
                          outdir,
                          outdir.bperr.name = "BaseErrorModel",
                          coverage_binning = 50,
@@ -68,7 +68,7 @@ compute_pbem <- function(sample.info.file,
     cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
-             germlineset=get_germlineset(sifgerm = sif[[1]],pacbamfolder = pacbamfolder,chrom = chrom),
+             germlineset=get_germlineset(sifgerm = sif[[1]],pacbamfolder_bychrom = pacbamfolder_bychrom,chrom = chrom),
              step=step,
              chrom=chrom,
              covbin=define_cov_bins(coverage_binning)[[1]],
