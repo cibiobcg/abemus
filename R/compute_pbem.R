@@ -130,8 +130,9 @@ compute_pbem <- function(sample.info.file,
                     "bperr","tot_reads_supporting_alt")
   colnames( bperr ) <- header.bperr
   rownames( bperr ) <- bperr$group
+  save(bperr,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = T)
   cat(paste("[",Sys.time(),"]\talright.","\n"))
-  return(list(bperr=bperr,
+  return(list(pbem_tab=bperr,
               bperr_summary=bperr_summary,
               bperr_tabstat=bperr_tabstat))
 }
