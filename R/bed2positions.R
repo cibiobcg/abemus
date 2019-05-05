@@ -1,6 +1,6 @@
 #' bed2positions
 #' @param targetbed Genomic regions in the BED tab-delimited format.
-#' @param get_only_chromosomes return only the list of chromosomes in the BED file
+#' @param get_only_chromosomes return only the list of chromosomes in the BED file. default: FALSE
 #' @param chrom_to_extract the chromosome name to extract as i.e. "chr1"
 #' @return PosByChrom A list of data.frames, each for each chromosome.
 #' @return chromosomes The chromosomes included in the BED file.
@@ -25,7 +25,9 @@ bed2positions <- function(targetbed,
 
     unwrap <- function(x){return(seq.int(from = x[2],to = x[3]))}
 
-    PosByChrom <- data.frame(chr=chr,
+    bed_chrom <- bed[grep(bed$V1,pattern = chrom_to_extract),,drop=F]
+
+    PosByChrom <- data.frame(chr=chrom_to_extract,
                              pos=as.numeric(unlist( apply(bed_chrom, MARGIN=1,FUN = unwrap))),
                              stringsAsFactors = F)
     PosByChrom$group <- paste(PosByChrom$chr,PosByChrom$pos,sep=":")
