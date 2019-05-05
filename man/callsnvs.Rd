@@ -4,7 +4,7 @@
 \alias{callsnvs}
 \title{callsnvs}
 \usage{
-callsnvs(sample.info.file, targetbp, pacbamfolder,
+callsnvs(sample.info.file, targetbp, pacbamfolder_bychrom,
   pbem_dir = file.path(outdir, "BaseErrorModel"),
   PBEsim = "~/datasetoy/RData/PBEsim.RData", AFbycov = TRUE,
   minaf_cov_corrected, mincov = 10, mincovgerm = 10, minalt = 1,
@@ -16,7 +16,7 @@ callsnvs(sample.info.file, targetbp, pacbamfolder,
 
 \item{targetbp}{folder with RData for each annotated positions}
 
-\item{pacbamfolder}{folder with pileups}
+\item{pacbamfolder_bychrom}{folder with pileups}
 
 \item{pbem_dir}{folder with pbem data. default: file.path(outdir, BaseErrorModel)}
 

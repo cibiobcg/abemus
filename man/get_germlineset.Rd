@@ -4,12 +4,12 @@
 \alias{get_germlineset}
 \title{Get list of pileups for germline samples}
 \usage{
-get_germlineset(sifgerm, pacbamfolder, chrom)
+get_germlineset(sifgerm, pacbamfolder_bychrom, chrom)
 }
 \arguments{
 \item{sifgerm}{sample info file}
 
-\item{pacbamfolder}{folder with pileups}
+\item{pacbamfolder_bychrom}{folder with pileups}
 
 \item{chrom}{chromosome}
 }

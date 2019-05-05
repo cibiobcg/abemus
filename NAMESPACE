@@ -2,6 +2,7 @@
 
 export(adjust_af_threshold_table)
 export(apply_scaling_factor)
+export(bed2positions)
 export(callsnvs)
 export(compute_afthreshold)
 export(compute_pbem)

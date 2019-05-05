@@ -4,7 +4,7 @@
 \alias{compute_pbem}
 \title{Compute pbem}
 \usage{
-compute_pbem(sample.info.file, targetbp, pacbamfolder, outdir,
+compute_pbem(sample.info.file, targetbp, pacbamfolder_bychrom, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,
   af_max_to_compute_thresholds = 0.2,
   coverage_min_to_compute_thresholds = 10,
@@ -17,7 +17,7 @@ compute_pbem(sample.info.file, targetbp, pacbamfolder, outdir,
 
 \item{targetbp}{folder with RData for each annotated positions}
 
-\item{pacbamfolder}{folder with pileups}
+\item{pacbamfolder_bychrom}{folder with pileups}
 
 \item{outdir}{output folder for this step analysis}
 
