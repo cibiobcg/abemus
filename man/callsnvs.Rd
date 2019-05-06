@@ -4,7 +4,7 @@
 \alias{callsnvs}
 \title{callsnvs}
 \usage{
-callsnvs(sample.info.file, targetbp, pacbamfolder_bychrom,
+callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
   pbem_dir = file.path(outdir, "BaseErrorModel"), AFbycov = TRUE,
   minaf_cov_corrected, mincov = 10, mincovgerm = 10, minalt = 1,
   maxafgerm = 0.2, coverage_binning = 50, outdir,
@@ -13,7 +13,7 @@ callsnvs(sample.info.file, targetbp, pacbamfolder_bychrom,
 \arguments{
 \item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
 
-\item{targetbp}{folder with RData for each annotated positions}
+\item{targetbed}{targeted regions in BED format.}
 
 \item{pacbamfolder_bychrom}{folder with pileups}
 

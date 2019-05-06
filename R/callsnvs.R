@@ -1,7 +1,7 @@
 #' callsnvs
 #'
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
-#' @param targetbp folder with RData for each annotated positions
+#' @param targetbed targeted regions in BED format.
 #' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
 #' @param minaf_cov_corrected the output of adjust_af_threshold_table()
 #' @param mincov Minimum locus coverage in case sample. default: 10
@@ -16,7 +16,7 @@
 #' @param chrom.in.parallel number of chromosomes to run in parallel. default: 1
 #' @export
 callsnvs <- function(sample.info.file,
-                     targetbp,
+                     targetbed,
                      pacbamfolder_bychrom,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
                      AFbycov = TRUE,
@@ -33,9 +33,8 @@ callsnvs <- function(sample.info.file,
   cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
   sif <- import_sif(main_sif = sample.info.file)
 
-  cat(paste("[",Sys.time(),"]\tReading chromosomes from bpcovered.tsv","\n"))
-  chromosomes = read.delim(file = file.path(targetbp,"bpcovered.tsv"),as.is=T)
-  chromosomes = sort(paste0("chr",chromosomes[-nrow(chromosomes),1]))
+  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  chromosomes <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
   cat(paste("[",Sys.time(),"]\tDetection of somatic SNVs in case samples","\n"))
   if(!file.exists(file.path(outdir, outdir.calls.name))){
@@ -54,8 +53,8 @@ callsnvs <- function(sample.info.file,
   write.table(fpam,file = file.path(outdir, outdir.calls.name, "filtering_criteria.txt"),col.names = T,row.names = F,sep="\t",quote = F)
 
   # Import background pbem
-  tab_bg_pbem = read.delim(file = file.path(pbem_dir, "pbem_background.tsv"),as.is=T,header=T,stringsAsFactors = F)
-  xbg <- as.numeric(tab_bg_pbem$background_pbem)
+  load(file.path(pbem_dir, "pbem_background.RData"))
+  xbg <- as.numeric(bgpbem)
 
   TableSif <- sif[[2]]
   for(id in 1:nrow(TableSif)){
