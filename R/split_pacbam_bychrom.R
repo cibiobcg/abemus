@@ -12,8 +12,8 @@ split_pacbam_bychrom <- function(targetbed,
   pacbamlist = list.files(pacbamfolder,full.names = T,pattern = "\\.pabs$|\\.pileup$")
   samplelist = unique(gsub(basename(pacbamlist),pattern = '.pabs|.pileup',replacement = ''))
 
-  CHR = read.delim(targetbed,as.is = T,header = F,stringsAsFactors = F)
-  CHR = sort(unique(CHR[,1]))
+  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  CHR <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
   for(sname in samplelist){
     dirname <- sname
