@@ -4,12 +4,17 @@
 \alias{apply_scaling_factor}
 \title{apply_scaling_factor}
 \usage{
-apply_scaling_factor(tabindex, R = 1)
+apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE,
+  target_size = NA)
 }
 \arguments{
-\item{tabindex}{output from callsnvs()}
+\item{tabindex}{output from callsnvs(). (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())}
 
 \item{R}{scaling factor to be applied at filter.pbem_coverage value. default = 1}
+
+\item{use.optimal.R}{Automatically use the best R given mean coverage of the case sample and size of targeted regions. default: FALSE}
+
+\item{target_size}{(if use.optimal.R = TRUE) target size in Mb of the BED file. Use get_target_size()}
 }
 \description{
 apply_scaling_factor
