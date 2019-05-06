@@ -16,9 +16,21 @@ get_stats_pbem <- function(dt,n_pos_af_th){
     if(dt[i,"af"] < n_pos_af_th){m[dt$group[i],7] <- m[dt$group[i],7] + 1}
     if(dt[i,"af"] >= n_pos_af_th){m[dt$group[i],8] <- m[dt$group[i],8] + 1}
   }
-  out <- as.data.table(m)
-  out$group <- rownames(m)
-  colnames(out) <- c("tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth",
-                     "n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","group")
+
+  out <- as.data.frame(m)
+
+  colnames(out) <- c("tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth")
+
+  out$group <- rownames(out)
+  out$chr <- sapply(strsplit(out$group,":"), `[`, 1)
+  out$pos <- sapply(strsplit(out$group,":"), `[`, 2)
+  out$ref <- sapply(strsplit(out$group,":"), `[`, 3)
+  out$dbsnp <- sapply(strsplit(out$group,":"), `[`, 4)
+
+  out <- out[,c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth")]
+
+  row.names(out) <- NULL
+  out$group <- paste(out$chr,out$pos,out$ref,sep = ":")
+
   return(out)
 }

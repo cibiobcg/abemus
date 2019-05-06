@@ -3,12 +3,11 @@
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
-#' @param targetbp folder with RData for each annotated positions
+#' @param targetbed targeted regions in BED format.
 #' @param pacbamfolder_bychrom folder with pileups
 #' @param outdir output folder for this step analysis
 #' @param outdir.bperr.name folder will be created in outdir. default: "BaseErrorModel"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
-#' @param bam.with.chr default: FALSE
 #' @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2
 #' @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10
 #' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
@@ -18,7 +17,7 @@
 #' @param step into how many positions to split the chrom file. default: 5000
 #' @return list(bperr, bperr_summary, bperr_tabstat)
 compute_pbem <- function(sample.info.file,
-                         targetbp,
+                         targetbed,
                          pacbamfolder_bychrom,
                          outdir,
                          outdir.bperr.name = "BaseErrorModel",
@@ -29,14 +28,12 @@ compute_pbem <- function(sample.info.file,
                          coverage_min_to_compute_pbem = 10,
                          n_pos_af_th = 0.2,
                          mc.cores = 1,
-                         step = 5000,
-                         bam.with.chr = FALSE){
+                         step = 5000){
   cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
   sif <- import_sif(main_sif = sample.info.file)
 
-  cat(paste("[",Sys.time(),"]\tReading chromosomes from bpcovered.tsv","\n"))
-  chromosomes = read.delim(file = file.path(targetbp,"bpcovered.tsv"),as.is=T)
-  chromosomes = sort(paste0("chr",chromosomes[-nrow(chromosomes),1]))
+  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  chromosomes <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
   cat(paste("[",Sys.time(),"]\tComputation of per-base error model","\n"))
 
@@ -48,22 +45,23 @@ compute_pbem <- function(sample.info.file,
   for(chrom in unique(chromosomes)){
     cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
 
-    tp = list.files(targetbp,pattern = paste0(chrom,"\\.RData$"),full.names = T)
-    load(tp,verbose = F)
-    chromTargetPositions = as.data.table(chromTargetPositions,keep.rownames = F)
+    #tp = list.files(targetbp,pattern = paste0(chrom,"\\.RData$"),full.names = T)
+    #load(tp,verbose = F)
 
-    mytargets = unique(chromTargetPositions)
-    targetsFILT <- mytargets
-    targetsFILT$randompos <- 1 # deprecated, to be removed
+    tp <- bed2positions(targetbed = targetbed,chrom_to_extract = chrom,get_only_chromosomes = FALSE)
+
+    #chromTargetPositions = as.data.table(chromTargetPositions,keep.rownames = F)
+
+    targets <- unique(tp$PosByChrom)
+
+    #mytargets = unique(chromTargetPositions)
+    #targetsFILT <- mytargets
+    #targetsFILT$randompos <- 1 # deprecated, to be removed
 
     # Final targets
-    targets = unique(targetsFILT)
-    targets = targets[with(targets,order(chr,pos)),]
-    targets = as.data.frame(targets)
-
-    if(bam.with.chr){
-      targets$chr = paste0('chr',targets$chr)
-    }
+    #targets = unique(targetsFILT)
+    #targets = targets[with(targets,order(chr,pos)),]
+    #targets = as.data.frame(targets)
 
     cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
     mclapply(seq(1,nrow(targets),step),pos2bperr,
@@ -104,36 +102,27 @@ compute_pbem <- function(sample.info.file,
   # overall statistics on pbems
   cmd.merge = paste("cat bperr_chr*.tsv > bperr.tsv")
   system(cmd.merge)
-  bperr = fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5))
+  pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5),data.table = F)
+  header_pbem_tab <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")
+  colnames( pbem_tab ) <- header_pbem_tab
+  rownames( pbem_tab ) <- pbem_tab$group
 
   # summary stats for pbem across the target
-  bperr_summary = summary(bperr$V22)
-  names = names(bperr_summary)
-  bperr_summary = data.frame(as.numeric(bperr_summary))
-  bperr_summary = rbind(bperr_summary,sd(x = bperr$V16,na.rm = T))
-  rownames(bperr_summary) = c(names,"std")
-  write.table(bperr_summary,file = file.path(outdir, outdir.bperr.name,"bperr_summary.tsv"),row.names = T,col.names = F,quote = F,sep = "\t")
+  bperr_summary = summary(pbem_tab$bperr) # bperr
+  save(bperr_summary,file = file.path(outdir, outdir.bperr.name,"bperr_summary.RData"))
 
   # compute background pbem
-  bperr_subset = bperr[which(bperr$V17 == 0),]
-  bgpbem = (sum(as.numeric(bperr_subset$V23)))/(sum(as.numeric(bperr_subset$V10)))
-  mean_pbem = mean(as.numeric(bperr_subset$V22),na.rm = T)
-  bperr_tabstat = data.frame(background_pbem = bgpbem,
-                             mean_pbem = mean_pbem,
-                             stringsAsFactors = F)
-  write.table(bperr_tabstat,file = file.path(outdir, outdir.bperr.name,"pbem_background.tsv"),row.names = F,col.names = T,quote = F,sep = "\t")
+  bperr_subset <- pbem_tab[which(pbem_tab$n_pos_af_gth == 0),] # select only pos never > n_pos_af_gth
+  bgpbem = (sum(as.numeric(bperr_subset$tot_reads_supporting_alt)))/(sum(as.numeric(bperr_subset$tot_coverage)))
+  mean_pbem = mean(as.numeric(bperr_subset$bperr),na.rm = T)
+  save(bgpbem,mean_pbem,file = file.path(outdir, outdir.bperr.name,"pbem_background.RData"))
 
-  header.bperr <- c("group","chr","pos","ref","dbsnp","gc","map","uniq","is_rndm",
-                    "tot_coverage","total.A","total.C","total.G","total.T",
-                    "n_pos_available","n_pos_af_lth","n_pos_af_gth",
-                    "count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth",
-                    "bperr","tot_reads_supporting_alt")
-  colnames( bperr ) <- header.bperr
-  rownames( bperr ) <- bperr$group
-  save(bperr,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = T)
+  save(pbem_tab,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = T)
+
   cat(paste("[",Sys.time(),"]\talright.","\n"))
-  return(list(pbem_tab=bperr,
+  return(list(pbem_tab=pbem_tab,
               bperr_summary=bperr_summary,
-              bperr_tabstat=bperr_tabstat))
+              bgpbem=bgpbem,
+              mean_pbem=mean_pbem))
 }
 

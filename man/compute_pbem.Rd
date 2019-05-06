@@ -4,18 +4,17 @@
 \alias{compute_pbem}
 \title{Compute pbem}
 \usage{
-compute_pbem(sample.info.file, targetbp, pacbamfolder_bychrom, outdir,
+compute_pbem(sample.info.file, targetbed, pacbamfolder_bychrom, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,
   af_max_to_compute_thresholds = 0.2,
   coverage_min_to_compute_thresholds = 10,
   af_max_to_compute_pbem = 0.2, coverage_min_to_compute_pbem = 10,
-  n_pos_af_th = 0.2, mc.cores = 1, step = 5000,
-  bam.with.chr = FALSE)
+  n_pos_af_th = 0.2, mc.cores = 1, step = 5000)
 }
 \arguments{
 \item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
 
-\item{targetbp}{folder with RData for each annotated positions}
+\item{targetbed}{targeted regions in BED format.}
 
 \item{pacbamfolder_bychrom}{folder with pileups}
 
@@ -38,8 +37,6 @@ compute_pbem(sample.info.file, targetbp, pacbamfolder_bychrom, outdir,
 \item{mc.cores}{mc.core param from mclapply. default: 1}
 
 \item{step}{into how many positions to split the chrom file. default: 5000}
-
-\item{bam.with.chr}{default: FALSE}
 }
 \value{
 list(bperr, bperr_summary, bperr_tabstat)

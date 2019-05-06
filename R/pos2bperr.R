@@ -41,7 +41,7 @@ pos2bperr = function(id,
     cat(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."),"\n")
   } else {
     completetab_all = read.delim(filtpileup,stringsAsFactors = F,header = F,sep = "\t",na.strings = "")
-    names(completetab_all)=c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD","dbsnp")
+    names(completetab_all) <- c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD","dbsnp")
     # exclude annotated and private SNPs [ to compute AF threshold]
     completetab = completetab_all[which(is.na(completetab_all$dbsnp)),,drop=F]
     completetab = completetab[which(completetab$af <= af_max_to_compute_thresholds & completetab$RD >= coverage_min_to_compute_thresholds),,drop=F]
@@ -56,11 +56,13 @@ pos2bperr = function(id,
       write.table(mytabaf[,8:9],file = mytabafchrom,append = F,sep = "\t",quote = F,row.names = F,col.names = F)
 
       # compute pbem
-      completetab_dbsnp$group = paste(completetab_dbsnp$chr,completetab_dbsnp$pos,completetab_dbsnp$ref,sep=":")
-      completetab_dbsnp <- completetab_dbsnp[with(completetab_dbsnp,order(group)),]
-      ans <- get_stats_pbem(dt=completetab_dbsnp,n_pos_af_th=n_pos_af_th)
+      #completetab_dbsnp$group = paste(completetab_dbsnp$chr,completetab_dbsnp$pos,completetab_dbsnp$ref,sep=":")
+      completetab_dbsnp$group = paste(completetab_dbsnp$chr,completetab_dbsnp$pos,completetab_dbsnp$ref,completetab_dbsnp$dbsnp,sep=":")
+      #completetab_dbsnp$group = paste(completetab_dbsnp$chr,completetab_dbsnp$pos,sep=":")
+      #completetab_dbsnp <- completetab_dbsnp[with(completetab_dbsnp,order(group)),]
+      this_ans <- get_stats_pbem(dt=completetab_dbsnp,n_pos_af_th=n_pos_af_th)
 
-      save(ans,file = "infolist.RData")
+      # save(ans,file = "infolist.RData")
       # ans <- dat[,{list(tot_coverage=sum(RD,na.rm = T),
       #                   total.A=sum(A,na.rm = T),
       #                   total.C=sum(C,na.rm = T),
@@ -73,13 +75,14 @@ pos2bperr = function(id,
       #                   count.C_af_gth=length(C[which(af >= n_pos_af_th & C>0)]),
       #                   count.G_af_gth=length(G[which(af >= n_pos_af_th & G>0)]),
       #                   count.T_af_gth=length(T[which(af >= n_pos_af_th & T>0)]))},by=group]
-      this = as.data.table(this)
-      this$group = paste(this$chr,this$pos,this$ref,sep=":")
-      this_ans = merge(x = this,y = ans,by = "group",all.y = T)
-      this_ans = as.data.frame(this_ans)
+
+      #this <- as.data.table(this)
+      #ans <- as.data.table(ans)
+      #this_ans = merge(x = this,y = ans,by = "group",all.y = T)
+      #this_ans = as.data.frame(this_ans)
 
       tabstats <- do.call("rbind", lapply(seq(1,nrow(this_ans),1),get_pbem,tgf=this_ans))
-      tabstats = tabstats[with(tabstats, order(pos)), ]
+      #tabstats <- tabstats[with(tabstats, order(pos)), ]
 
       cat(paste("[",Sys.time(),"]\twriting output for positions in: ",filtpileup),"\n")
       write.table(tabstats,file = taboutchrom,append = F,quote = F,row.names = F,col.names = F,sep="\t")
