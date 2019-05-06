@@ -5,8 +5,7 @@
 \title{callsnvs}
 \usage{
 callsnvs(sample.info.file, targetbp, pacbamfolder_bychrom,
-  pbem_dir = file.path(outdir, "BaseErrorModel"),
-  PBEsim = "~/datasetoy/RData/PBEsim.RData", AFbycov = TRUE,
+  pbem_dir = file.path(outdir, "BaseErrorModel"), AFbycov = TRUE,
   minaf_cov_corrected, mincov = 10, mincovgerm = 10, minalt = 1,
   maxafgerm = 0.2, coverage_binning = 50, outdir,
   outdir.calls.name = "Results", chrom.in.parallel = 1)
@@ -19,8 +18,6 @@ callsnvs(sample.info.file, targetbp, pacbamfolder_bychrom,
 \item{pacbamfolder_bychrom}{folder with pileups}
 
 \item{pbem_dir}{folder with pbem data. default: file.path(outdir, BaseErrorModel)}
-
-\item{PBEsim}{default: "~/datasetoy/RData/PBEsim.RData"}
 
 \item{AFbycov}{Apply afth coverage based. default: AFbycov=TRUE}
 

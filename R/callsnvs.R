@@ -4,7 +4,6 @@
 #' @param targetbp folder with RData for each annotated positions
 #' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
 #' @param minaf_cov_corrected the output of adjust_af_threshold_table()
-#' @param PBEsim default: "~/datasetoy/RData/PBEsim.RData"
 #' @param mincov Minimum locus coverage in case sample. default: 10
 #' @param minalt Minimum number of reads supporting the alternative allele in case sample. default: 1
 #' @param mincovgerm Minimum locus coverage in germline sample. default: 10
@@ -20,7 +19,6 @@ callsnvs <- function(sample.info.file,
                      targetbp,
                      pacbamfolder_bychrom,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
-                     PBEsim = "~/datasetoy/RData/PBEsim.RData",
                      AFbycov = TRUE,
                      minaf_cov_corrected,
                      mincov = 10,
@@ -58,10 +56,6 @@ callsnvs <- function(sample.info.file,
   # Import background pbem
   tab_bg_pbem = read.delim(file = file.path(pbem_dir, "pbem_background.tsv"),as.is=T,header=T,stringsAsFactors = F)
   xbg <- as.numeric(tab_bg_pbem$background_pbem)
-
-  # Import matrix for coverages and pbem
-  load(PBEsim)
-  tab_cov_pbem = tab.list[[6]]
 
   TableSif <- sif[[2]]
   for(id in 1:nrow(TableSif)){
@@ -110,9 +104,9 @@ callsnvs <- function(sample.info.file,
              minaf_cov_corrected=minaf_cov_corrected,
              coverage_binning=coverage_binning,
              xbg=xbg,
-             tab_cov_pbem=tab_cov_pbem,
-             afs=afs,
-             covs=covs,
+             tab_cov_pbem=bombanel_tab_cov_pbem,
+             afs=bombanel_afs,
+             covs=bombanel_covs,
              mc.cores = chrom.in.parallel)
 
     # collapse all chromosome outs into a single table
