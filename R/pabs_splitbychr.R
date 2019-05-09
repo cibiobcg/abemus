@@ -1,4 +1,3 @@
-#' pabs_splitbychr
 pabs_splitbychr <- function(id,CHR,snvs_file){
   chrom = CHR[id]
   filename = gsub(basename(snvs_file),pattern = ".pabs",replacement = paste0("_chr",gsub(chrom,pattern = "chr",replacement = ""),".pabs"))

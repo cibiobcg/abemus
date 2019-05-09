@@ -1,5 +1,3 @@
-#' get_afth
-#'
 get_afth <- function(num,
                      idx,
                      next.bin.AFgtz,

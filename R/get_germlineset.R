@@ -1,10 +1,10 @@
-#' Get list of pileups for germline samples
-#'
-#' @param sifgerm sample info file
-#' @param pacbamfolder_bychrom folder with pileups
-#' @param chrom chromosome
-#' @export
-#' @return A character string with the path to germline pileups
+# Get list of pileups for germline samples
+#
+# @param sifgerm sample info file
+# @param pacbamfolder_bychrom folder with pileups
+# @param chrom chromosome
+# @export
+# @return A character string with the path to germline pileups
 get_germlineset <- function(sifgerm,pacbamfolder_bychrom,chrom){
   germlineset = c()
   for(id in 1:nrow(sifgerm)){

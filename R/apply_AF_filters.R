@@ -1,5 +1,3 @@
-#' apply_AF_filters
-#'
 apply_AF_filters <- function(chrpmF1,
                              AFbycov,
                              af.threshold.table,

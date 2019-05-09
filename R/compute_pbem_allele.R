@@ -1,5 +1,3 @@
-#' compute_pbem_allele
-#'
 compute_pbem_allele <- function(id,abemus){
   locus = abemus[id,,drop=F]
   locus$pbem_allele = locus[,paste0('total.',locus$alt)]/locus$tot_coverage

@@ -1,4 +1,3 @@
-#' pileup_splitbychr
 pileup_splitbychr <- function(id,CHR,pileup_file){
   chrom = CHR[id]
   filename = gsub(basename(pileup_file),pattern = ".pileup",replacement = paste0("_chr",gsub(chrom,pattern = "chr",replacement = ""),".pileup"))

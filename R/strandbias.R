@@ -1,5 +1,3 @@
-#' strandbias
-#'
 strandbias = function(fwd.ref,fwd.alt,rev.ref,rev.alt){
   if(fwd.alt+rev.alt==0 | fwd.ref+rev.ref==0){
     return(NA)

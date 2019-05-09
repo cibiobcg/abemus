@@ -1,5 +1,3 @@
-#' get_tabcalls_path
-#'
 get_tabcalls_path <- function(TableSif,outdir,outdir.calls.name){
   tabsnvs_index <- TableSif[,c(1,2,4)]
   tabsnvs_index$tabcalls_f1 <- NA

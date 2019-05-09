@@ -1,6 +1,3 @@
-#' filter
-#'
-#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 filter = function(i,
                   chromosomes,
                   caseout_folder=caseout_folder,

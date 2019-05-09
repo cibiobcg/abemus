@@ -1,18 +1,18 @@
-#' pos2bperr
-#'
-#' Compute the per-base error model for each position
-#' @param id index
-#' @param targets targeted positions
-#' @param germlineset unique list of germlines samples from sif, see get_germlineset(sif)
-#' @param step into how many positions to split the chrom file. default: 5000
-#' @param chrom chromosome to process
-#' @param lev Levels of coverage, see define_cov_bins(coverage_binning)
-#' @param covbin Bins of coverage, see define_cov_bins(coverage_binning)
-#' @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2
-#' @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10
-#' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
-#' @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10
-#' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
+# pos2bperr
+#
+# Compute the per-base error model for each position
+# @param id index
+# @param targets targeted positions
+# @param germlineset unique list of germlines samples from sif, see get_germlineset(sif)
+# @param step into how many positions to split the chrom file. default: 5000
+# @param chrom chromosome to process
+# @param lev Levels of coverage, see define_cov_bins(coverage_binning)
+# @param covbin Bins of coverage, see define_cov_bins(coverage_binning)
+# @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2
+# @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10
+# @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
+# @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10
+# @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
 pos2bperr = function(id,
                      targets,
                      germlineset,

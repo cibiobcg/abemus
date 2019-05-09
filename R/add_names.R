@@ -1,5 +1,3 @@
-#' add_names
-#'
 add_names <- function(pm,
                       name.patient,
                       name.plasma,

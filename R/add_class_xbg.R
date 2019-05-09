@@ -1,5 +1,3 @@
-#' add_class_xbg
-#'
 add_class_xbg = function(pmtab,xbg){
   if(nrow(pmtab)>0){
     pmtab$CLASS.xbg = NA

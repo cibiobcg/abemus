@@ -1,5 +1,3 @@
-#' CheckAltReads
-#'
 CheckAltReads <- function(i,snvs){
   this = snvs[i,,drop=F]
   altbase = this$alt

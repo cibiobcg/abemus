@@ -1,5 +1,3 @@
-#' add_class
-#'
 add_class = function(pmtab){
   pmtab$CLASS = NA
   pmtab$CLASS[which(pmtab$af_control==0 & pmtab$bperr==0 & pmtab$pbem_allele==0)] = 1
