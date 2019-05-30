@@ -5,8 +5,11 @@
 \title{callsnvs}
 \usage{
 callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
-  pbem_dir = file.path(outdir, "BaseErrorModel"), AFbycov = TRUE,
-  minaf_cov_corrected, mincov = 10, mincovgerm = 10, minalt = 1,
+  pbem_dir = file.path(outdir, "BaseErrorModel"),
+  controls_dir = file.path(outdir, "Controls"),
+  detection.specificity = 0.995, replicas = 1000,
+  replicas.in.parallel = 1, coeffvar.threshold = 0.01,
+  AFbycov = TRUE, mincov = 10, mincovgerm = 10, minalt = 1,
   maxafgerm = 0.2, coverage_binning = 50, outdir,
   outdir.calls.name = "Results", chrom.in.parallel = 1)
 }
@@ -17,11 +20,19 @@ callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
 
 \item{pacbamfolder_bychrom}{folder with pileups}
 
-\item{pbem_dir}{folder with pbem data. default: file.path(outdir, BaseErrorModel)}
+\item{pbem_dir}{folder with pbem data. default: file.path(outdir, "BaseErrorModel")}
+
+\item{controls_dir}{folder with afth data. default: file.path(outdir,"Controls")}
+
+\item{detection.specificity}{The quantile of the GSE distribution(s) to use to compute the afth. default: 0.995}
+
+\item{replicas}{Relpica sampling to define stability of afth in bins of coverage. default: 1000}
+
+\item{replicas.in.parallel}{default: 1}
+
+\item{coeffvar.threshold}{Consider a bin as stable if the Coeff of variations after n replicas is lower than coeffvar.threshold. default: 0.01}
 
 \item{AFbycov}{Apply afth coverage based. default: AFbycov=TRUE}
-
-\item{minaf_cov_corrected}{the output of adjust_af_threshold_table()}
 
 \item{mincov}{Minimum locus coverage in case sample. default: 10}
 

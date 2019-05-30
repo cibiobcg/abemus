@@ -4,11 +4,8 @@
 \alias{adjust_af_threshold_table}
 \title{adjust_af_threshold_table}
 \usage{
-adjust_af_threshold_table(controls_dir = file.path(outdir, "Controls"),
-  pbem_dir = file.path(outdir, "BaseErrorModel"),
-  detection.specificity = 0.995, replicas = 10,
-  replicas.in.parallel = 1, coverage_binning = 50,
-  coeffvar.threshold = 0.01)
+adjust_af_threshold_table(controls_dir, pbem_dir, detection.specificity,
+  replicas, replicas.in.parallel, coverage_binning, coeffvar.threshold)
 }
 \arguments{
 \item{controls_dir}{folder with afth data. default: file.path(outdir,"Controls")}

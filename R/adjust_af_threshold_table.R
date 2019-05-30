@@ -1,6 +1,5 @@
 #' adjust_af_threshold_table
 #'
-#' @export
 #' @param controls_dir folder with afth data. default: file.path(outdir,"Controls")
 #' @param pbem_dir folder with pbem data. default: file.path(outdir,"BaseErrorModel")
 #' @param detection.specificity default: 0.995
@@ -9,13 +8,13 @@
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param coeffvar.threshold Consider a bin as stable if the Coeff of variations after n replicas is lower than coeffvar.threshold. default: 0.01
 #' @return corrected af threshold table
-adjust_af_threshold_table <- function(controls_dir = file.path(outdir,"Controls"),
-                                      pbem_dir = file.path(outdir,"BaseErrorModel"),
-                                      detection.specificity=0.995,
-                                      replicas=10,
-                                      replicas.in.parallel=1,
-                                      coverage_binning=50,
-                                      coeffvar.threshold=0.01){
+adjust_af_threshold_table <- function(controls_dir,
+                                      pbem_dir,
+                                      detection.specificity,
+                                      replicas,
+                                      replicas.in.parallel,
+                                      coverage_binning,
+                                      coeffvar.threshold){
 
   dthdataFile <- file.path(controls_dir,"datathreshold.RData")
   if(file.exists(dthdataFile)){

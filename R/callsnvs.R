@@ -2,25 +2,33 @@
 #'
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbed targeted regions in BED format.
-#' @param pbem_dir folder with pbem data. default: file.path(outdir, BaseErrorModel)
-#' @param minaf_cov_corrected the output of adjust_af_threshold_table()
+#' @param pacbamfolder_bychrom folder with pileups
+#' @param pbem_dir folder with pbem data. default: file.path(outdir, "BaseErrorModel")
+#' @param controls_dir folder with afth data. default: file.path(outdir,"Controls")
+#' @param detection.specificity The quantile of the GSE distribution(s) to use to compute the afth. default: 0.995
+#' @param replicas Relpica sampling to define stability of afth in bins of coverage. default: 1000
+#' @param replicas.in.parallel default: 1
+#' @param coeffvar.threshold Consider a bin as stable if the Coeff of variations after n replicas is lower than coeffvar.threshold. default: 0.01
+#' @param AFbycov Apply afth coverage based. default: AFbycov=TRUE
 #' @param mincov Minimum locus coverage in case sample. default: 10
-#' @param minalt Minimum number of reads supporting the alternative allele in case sample. default: 1
 #' @param mincovgerm Minimum locus coverage in germline sample. default: 10
+#' @param minalt Minimum number of reads supporting the alternative allele in case sample. default: 1
 #' @param maxafgerm Maximum allelic fraction observed in matched germline locus. default: 0.2
+#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param outdir output folder for this step analysis
 #' @param outdir.calls.name folder will be created in outdir. default: "Results"
-#' @param AFbycov Apply afth coverage based. default: AFbycov=TRUE
-#' @param pacbamfolder_bychrom folder with pileups
-#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param chrom.in.parallel number of chromosomes to run in parallel. default: 1
 #' @export
 callsnvs <- function(sample.info.file,
                      targetbed,
                      pacbamfolder_bychrom,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
+                     controls_dir = file.path(outdir,"Controls"),
+                     detection.specificity = 0.995,
+                     replicas = 1000,
+                     replicas.in.parallel = 1,
+                     coeffvar.threshold = 0.01,
                      AFbycov = TRUE,
-                     minaf_cov_corrected,
                      mincov = 10,
                      mincovgerm = 10,
                      minalt = 1,
@@ -40,6 +48,16 @@ callsnvs <- function(sample.info.file,
   if(!file.exists(file.path(outdir, outdir.calls.name))){
     dir.create(file.path(outdir, outdir.calls.name), showWarnings = T)
   }
+
+  # compute minaf_cov_corrected
+  afthcor <- adjust_af_threshold_table(controls_dir = controls_dir,
+                                       pbem_dir = pbem_dir,
+                                       detection.specificity = detection.specificity,
+                                       replicas = replicas,
+                                       coverage_binning = coverage_binning,
+                                       replicas.in.parallel = replicas.in.parallel,
+                                       coeffvar.threshold = coeffvar.threshold)
+  minaf_cov_corrected <- afthcor$minaf_cov_corrected
 
   # summary of thresholds applied
   fpam = data.frame(AFbycov = as.character(AFbycov),
