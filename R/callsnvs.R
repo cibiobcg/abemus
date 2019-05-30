@@ -35,8 +35,8 @@ callsnvs <- function(sample.info.file,
                      maxafgerm = 0.2,
                      coverage_binning = 50,
                      outdir,
-                     outdir.calls.name="Results",
-                     chrom.in.parallel=1){
+                     outdir.calls.name = "Results",
+                     chrom.in.parallel = 1){
 
   cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
   sif <- import_sif(main_sif = sample.info.file)
@@ -74,7 +74,7 @@ callsnvs <- function(sample.info.file,
   load(file.path(pbem_dir, "pbem_background.RData"))
   xbg <- as.numeric(bgpbem)
 
-  TableSif <- sif[[2]]
+  TableSif <- sif$df_cases
   for(id in 1:nrow(TableSif)){
     this = TableSif[id,]
     name.patient = TableSif$patient[id]
@@ -88,15 +88,29 @@ callsnvs <- function(sample.info.file,
     caseout_folder = file.path(outdir, outdir.calls.name, name.plasma)
     dir.create(caseout_folder,showWarnings = T)
 
-    germline.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.germline,"$"),full.names = T)
-    if(length(germline.folder)==0){
-      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.germline))
-      stop()
-    }
-    plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
-    if(length(plasma.folder)==0){
-      message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
-      stop()
+    if(is.na(name.germline)){
+
+      germline.folder <- NA
+
+      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
+      if(length(plasma.folder)==0){
+        message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
+        stop()
+      }
+
+    } else {
+
+      germline.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.germline,"$"),full.names = T)
+      if(length(germline.folder)==0){
+        message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.germline))
+        stop()
+      }
+      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
+      if(length(plasma.folder)==0){
+        message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
+        stop()
+      }
+
     }
 
     # run in parallel on chromosomes

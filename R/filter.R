@@ -53,25 +53,44 @@ filter = function(i,
   if(nrow(snvs)==0){
     return()
   }
-  # print filtered positions and grep these pos only from pileup file of germline sample
-  cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = F)
-  controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_",chrom,".pileup"),full.names = T)
-  cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
-  system(cmd)
-  ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = F,showProgress = T,header = F,na.strings = "",colClasses = list(character=10))
-  system("rm postogrep.txt filtered.germline.pileup.txt")
-  ctrl.pileup = ctrl.pileup[,1:9]
-  ctrl.pileup = unique(ctrl.pileup)
-  ctrl.pileup = data.frame(ctrl.pileup)
-  names(ctrl.pileup)=c("chr","pos","ref","A","C","G","T","af","cov")
+
+  if(is.na(germline.folder)){
+
+    ctrl.pileup <- data.frame(chr=chrom,
+                              pos=snvs$pos,
+                              ref=snvs$ref,stringsAsFactors = F)
+    ctrl.pileup <- cbind(ctrl.pileup,NA,NA,NA,NA,NA,NA)
+    names(ctrl.pileup)=c("chr","pos","ref","A","C","G","T","af","cov")
+
+  } else {
+    # print filtered positions and grep these pos only from pileup file of germline sample
+    cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = F)
+    controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_",chrom,".pileup"),full.names = T)
+    cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
+    system(cmd)
+    ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = F,showProgress = T,header = F,na.strings = "",colClasses = list(character=10))
+    system("rm postogrep.txt filtered.germline.pileup.txt")
+    ctrl.pileup = ctrl.pileup[,1:9]
+    ctrl.pileup = unique(ctrl.pileup)
+    ctrl.pileup = data.frame(ctrl.pileup)
+    names(ctrl.pileup)=c("chr","pos","ref","A","C","G","T","af","cov")
+  }
+
   # F1) Custom basic filters [ in germline ]
   common = merge(x = snvs,y = ctrl.pileup,by = c("chr","pos","ref"),all.x = T,suffixes = c("_case","_control"))
-  toremove = which(common$cov_control < mincovgerm | common$af_control > maxafgerm )
+
+  if(is.na(germline.folder)){
+    toremove <- NULL
+  } else {
+    toremove = which(common$cov_control < mincovgerm | common$af_control > maxafgerm )
+  }
+
   if(length(toremove)>0){
     putsnvs <- common[-toremove,,drop=F]
   } else {
     putsnvs <- common
   }
+
   if(nrow(putsnvs) > 0){
     # F2) Filters on Variant Allelic Fraction and add pbem [ in plasma/tumor ]
     # import pbem of this chrom
@@ -101,7 +120,8 @@ filter = function(i,
     # compute pbem allele
     Nids = which(cpmf1$alt=='N')
     if(length(Nids)>0){cpmf1 = cpmf1[-Nids,]}
-    cpmf1 = cpmf1[which(!is.na(cpmf1$cov_control)),,drop=F]
+    if(!is.na(germline.folder)){cpmf1 = cpmf1[which(!is.na(cpmf1$cov_control)),,drop=F]}
+
     if(nrow(cpmf1)==0){
       return()
     }
@@ -112,7 +132,11 @@ filter = function(i,
     cpmf1 = fromListToDF(out)
 
     # add CLASS standard
-    cpmf1 = add_class(pmtab = cpmf1)
+    if(is.na(germline.folder)){
+      cpmf1$CLASS <- NA
+    } else {
+      cpmf1 <- add_class(pmtab = cpmf1)
+    }
 
     # TABLE 2
     cpmf1$af_threshold[which(is.na(cpmf1$af_threshold))] <- -1
@@ -123,9 +147,15 @@ filter = function(i,
 
     # TABLE 3
     # add CLASS background pbem
-    cpmf3 = add_class_xbg(pmtab = cpmf2,xbg = xbg)
-    cpmf3$bperr[which(cpmf3$bperr > 0.2)] = 0.2
-    cpmf3$bperr[which(is.na(cpmf3$bperr))] = 0.2 # assign the highest pbem if it is NA
+    if(nrow(cpmf2)>0 & is.na(germline.folder)){
+      cpmf3 <- cpmf2
+      cpmf3$CLASS.xbg <- NA
+    } else {
+      cpmf3 <- add_class_xbg(pmtab = cpmf2,xbg = xbg)
+    }
+
+    cpmf3$bperr[which(cpmf3$bperr > 0.2)] <- 0.2
+    cpmf3$bperr[which(is.na(cpmf3$bperr))] <- 0.2 # assign the highest pbem if it is NA
 
     covs[which.max(covs)] <- Inf # define as max coverage to avoid NA values
 
