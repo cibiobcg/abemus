@@ -66,7 +66,7 @@ compute_pbem <- function(sample.info.file,
     cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
-             germlineset=get_germlineset(sifgerm = sif[[1]],pacbamfolder_bychrom = pacbamfolder_bychrom,chrom = chrom),
+             germlineset=get_germlineset(sifgerm = sif$df_ctrl,pacbamfolder_bychrom = pacbamfolder_bychrom,chrom = chrom),
              step=step,
              chrom=chrom,
              covbin=define_cov_bins(coverage_binning)[[1]],
