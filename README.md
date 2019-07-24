@@ -1,2 +1,2 @@
-# abemus
-Detection of somatic SNVs in cfDNA
+# ABEMUS
+Platform specific and data informed detection of somatic SNVs in cfDNA
