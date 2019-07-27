@@ -1,6 +1,6 @@
 Package: abemus
 Type: Package
-Title: Adaptive Base Error Model for Ultradeep Sequencing data
+Title: Adaptive Base Error Model in Ultra-deep Sequencing data
 Version: 0.1.0
 Author: Casiraghi et al. 2019
 Maintainer: Nicola Casiraghi <casiraghinicola@gmail.com>
