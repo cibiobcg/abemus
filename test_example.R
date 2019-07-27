@@ -1,3 +1,10 @@
+# For more information about the workflow refere to the ABEMUS wiki page:
+# https://github.com/cibiobcg/abemus/wiki/Usage
+
+require( "devtools" )
+require( "data.table" )
+require( "parallel" )
+
 library( devtools )
 devtools::install_github('ncasiraghi/rpabemus')
 
@@ -5,11 +12,11 @@ library( rpabemus )
 library( data.table )
 library( parallel )
 
-outdir <-  "~/datasetoy"
-sample.info.file <- "~/datasetoy/test_sif.tsv"
-targetbed <- "~/datasetoy/test_pacbam_originals/regions_merged.bed"
-pacbamfolder <- "~/datasetoy/test_pacbam_originals/"
-pacbamfolder_bychrom <- "~/datasetoy/test_pacbam_originals_bychrom/"
+outdir <-  "~/test_dataset_abemus/"
+sample.info.file <- "~/test_dataset_abemus/test_sif.tsv"
+targetbed <- "~/test_dataset_abemus/regions.bed"
+pacbamfolder <- "~/test_dataset_abemus/pacbam_data/"
+pacbamfolder_bychrom <- "~/test_dataset_abemus/pacbam_data_bychrom/"
 
 setwd(outdir)
 
