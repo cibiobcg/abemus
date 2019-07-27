@@ -45,23 +45,8 @@ compute_pbem <- function(sample.info.file,
   for(chrom in unique(chromosomes)){
     cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
 
-    #tp = list.files(targetbp,pattern = paste0(chrom,"\\.RData$"),full.names = T)
-    #load(tp,verbose = F)
-
     tp <- bed2positions(targetbed = targetbed,chrom_to_extract = chrom,get_only_chromosomes = FALSE)
-
-    #chromTargetPositions = as.data.table(chromTargetPositions,keep.rownames = F)
-
     targets <- unique(tp$PosByChrom)
-
-    #mytargets = unique(chromTargetPositions)
-    #targetsFILT <- mytargets
-    #targetsFILT$randompos <- 1 # deprecated, to be removed
-
-    # Final targets
-    #targets = unique(targetsFILT)
-    #targets = targets[with(targets,order(chr,pos)),]
-    #targets = as.data.frame(targets)
 
     cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
     mclapply(seq(1,nrow(targets),step),pos2bperr,
@@ -88,9 +73,9 @@ compute_pbem <- function(sample.info.file,
     system(cmdc)
     system("rm *_afz.table.txt")
   }
-  cmd.merge = paste("cat afgtz_chr*.tsv > afgtz.tsv")
+  cmd.merge = paste("cat afgtz_*.tsv > afgtz.tsv")
   system(cmd.merge)
-  cmd.merge = paste("cat afz_chr*.tsv > afz.tsv")
+  cmd.merge = paste("cat afz_*.tsv > afz.tsv")
   system(cmd.merge)
 
   # save counter of afz as RData
