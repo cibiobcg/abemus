@@ -85,7 +85,7 @@ compute_pbem <- function(sample.info.file,
   save(afz,file = "afz.RData",compress = T)
 
   # overall statistics on pbems
-  cmd.merge = paste("cat bperr_chr*.tsv > bperr.tsv")
+  cmd.merge = paste("cat bperr_*.tsv > bperr.tsv")
   system(cmd.merge)
   pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5),data.table = F)
   header_pbem_tab <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")

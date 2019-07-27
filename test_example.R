@@ -6,9 +6,9 @@ require( "data.table" )
 require( "parallel" )
 
 library( devtools )
-devtools::install_github('ncasiraghi/rpabemus')
+devtools::install_github( "cibiobcg/abemus" )
 
-library( rpabemus )
+library( abemus )
 library( data.table )
 library( parallel )
 
@@ -32,6 +32,7 @@ outpbem <- compute_pbem(sample.info.file = sample.info.file,
                         targetbed = targetbed,
                         outdir=outdir,
                         pacbamfolder_bychrom=pacbamfolder_bychrom)
+
 # outs
 head( outpbem$pbem_tab )
 outpbem$bperr_summary

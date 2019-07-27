@@ -22,13 +22,14 @@ filter = function(i,
                   covs,
                   coverage_binning,
                   njobs = 1){
-  chrom = chromosomes[i]
+  chrom <- chromosomes[i]
+  chrom <- gsub(chrom,pattern = 'chr',replacement = '')
   # create chromsome sub-folder
   chromdir = file.path(caseout_folder,chrom)
   dir.create(chromdir,showWarnings = T)
   setwd(chromdir)
   # import files
-  plasma_snvs = list.files(file.path(plasma.folder,"snvs"),pattern = paste0("_",chrom,".pabs"),full.names = T)
+  plasma_snvs = list.files(file.path(plasma.folder,"snvs"),pattern = paste0("_chr",chrom,".pabs"),full.names = T)
   n.rows.plasma_snvs = as.numeric(unlist(strsplit(trimws(x = system(paste("wc -l",plasma_snvs),intern = T),which = "left"),split = " "))[[1]])
   if(n.rows.plasma_snvs == 1){
     return()
@@ -65,7 +66,7 @@ filter = function(i,
   } else {
     # print filtered positions and grep these pos only from pileup file of germline sample
     cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = F)
-    controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_",chrom,".pileup"),full.names = T)
+    controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_chr",chrom,".pileup"),full.names = T)
     cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
     system(cmd)
     ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = F,showProgress = T,header = F,na.strings = "",colClasses = list(character=10))
