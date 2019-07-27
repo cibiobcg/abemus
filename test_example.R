@@ -1,10 +1,6 @@
 # For more information about the workflow refere to the ABEMUS wiki page:
 # https://github.com/cibiobcg/abemus/wiki/Usage
 
-require( "devtools" )
-require( "data.table" )
-require( "parallel" )
-
 library( devtools )
 devtools::install_github( "cibiobcg/abemus" )
 
