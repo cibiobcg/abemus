@@ -1,4 +1,4 @@
-# For more information about the workflow refere to the ABEMUS wiki page:
+# For more information about the workflow please refer to the ABEMUS wiki page:
 # https://github.com/cibiobcg/abemus/wiki/Usage
 
 library( devtools )
