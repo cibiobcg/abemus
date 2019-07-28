@@ -1,5 +1,7 @@
 # For more information about the workflow please refer to the ABEMUS wiki page:
 # https://github.com/cibiobcg/abemus/wiki/Usage
+#
+# Data available at: https://github.com/cibiobcg/abemus_models#test-dataset
 
 library( devtools )
 devtools::install_github( "cibiobcg/abemus" )
