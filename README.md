@@ -1,6 +1,8 @@
 # ABEMUS
 Platform specific and data informed detection of somatic SNVs in cfDNA
 
+## Documentation
+
 Visit project [Wiki](https://github.com/cibiobcg/abemus/wiki) for full ABEMUS documentation.
 
 ## Quick start
