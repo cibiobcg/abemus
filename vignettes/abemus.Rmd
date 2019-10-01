@@ -1,13 +1,16 @@
 ---
-title: "ABEMUS: Adaptive Base Error Model for Ultra-deep Sequencing data"
+title: "abemus"
 author: "Nicola Casiraghi"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ABEMUS: Adaptive Base Error Model for Ultra-deep Sequencing data}
+  %\VignetteIndexEntry{abemus}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
+
+**ABEMUS** (*Adaptive Base Error Model for Ultra-deep Sequencing data*) is a NGS-based computational method that uses control samples to build global and local sequencing error reference models that are then used to improve the detection of somatic SNVs in cfDNA samples.
+
 ## Computational workflow
 In [`step 1`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#1-compute-the-per-base-error-model) and [`step 2`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#2-compute-allelic-fraction-thresholds) only **control samples** are used to build the per-base error model and compute both coverage-dependent and coverage-independent allelic fraction thresholds. In [`step 3`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#3-call-somatic-snvs-in-case-samples) **tumor samples** are inspected and somatic snvs are called based on both custom filtering criteria (i.e. minimum coverage, minimum number of reads supporting an alternative allele) and allelic fraction thresholds. Then in [`step 4`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#4-filter-somatic-snvs-using-the-per-base-error-model), the per-base error model computed in `step 1` is exploited to further refine the final set of putative somatic snvs. Finally, output table with snvs calls can be formatted to get functional annotations by external tools (i.e. [Oncotator](https://portals.broadinstitute.org/oncotator/)).<br/>
 > The described workflow can be found in [test_example.R](https://github.com/ncasiraghi/rpabemus/blob/master/test_example.R) and you can run it on the [test dataset](https://github.com/cibiobcg/abemus_models#test-dataset).<br/>  

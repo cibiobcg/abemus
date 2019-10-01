@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Nicola Casiraghi" />
+
+<meta name="date" content="2019-10-01" />
+
+<title>abemus</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">abemus</h1>
+<h4 class="author">Nicola Casiraghi</h4>
+<h4 class="date">2019-10-01</h4>
+
+
+
+<p><strong>ABEMUS</strong> (<em>Adaptive Base Error Model for Ultra-deep Sequencing data</em>) is a NGS-based computational method that uses control samples to build global and local sequencing error reference models that are then used to improve the detection of somatic SNVs in cfDNA samples.</p>
+<div id="computational-workflow" class="section level2">
+<h2>Computational workflow</h2>
+<p>In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#1-compute-the-per-base-error-model"><code>step 1</code></a> and <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#2-compute-allelic-fraction-thresholds"><code>step 2</code></a> only <strong>control samples</strong> are used to build the per-base error model and compute both coverage-dependent and coverage-independent allelic fraction thresholds. In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#3-call-somatic-snvs-in-case-samples"><code>step 3</code></a> <strong>tumor samples</strong> are inspected and somatic snvs are called based on both custom filtering criteria (i.e. minimum coverage, minimum number of reads supporting an alternative allele) and allelic fraction thresholds. Then in <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#4-filter-somatic-snvs-using-the-per-base-error-model"><code>step 4</code></a>, the per-base error model computed in <code>step 1</code> is exploited to further refine the final set of putative somatic snvs. Finally, output table with snvs calls can be formatted to get functional annotations by external tools (i.e. <a href="https://portals.broadinstitute.org/oncotator/">Oncotator</a>).<br /> &gt; The described workflow can be found in <a href="https://github.com/ncasiraghi/rpabemus/blob/master/test_example.R">test_example.R</a> and you can run it on the <a href="https://github.com/cibiobcg/abemus_models#test-dataset">test dataset</a>.<br /></p>
+<p>Since the following inputs are used in all the main steps, you can initialise them just once at the beginning of your script:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># inputs</span></a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">outdir &lt;-<span class="st">  &quot;/my_project/Abemus_analysis/&quot;</span></a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">sample.info.file &lt;-<span class="st"> &quot;/my_project/info/sample_info_file.tsv&quot;</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">targetbed &lt;-<span class="st"> &quot;/my_project/info/regions.bed&quot;</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">pacbamfolder_bychrom &lt;-<span class="st"> &quot;/my_project/data/PaCBAM_outdir_bychrom&quot;</span></a></code></pre></div>
+<p><code>outdir</code> : The main directory that will be populated with subfolders and data files generated during each step.<br /> <code>targetbp</code> : The folder where you created <code>TargetPositions_chr.RData</code> data as described [here]<br />
+<code>sample_info_file.tsv</code> : The info file formatted as described <a href="https://github.com/ncasiraghi/rpabemus/wiki/Input-data#sample-info-file">here</a>.<br /> <code>pacbamfolder_bychrom</code> : The path to the folder where you created the per-base pileup data split by chromosome for each sample as described <a href="https://github.com/ncasiraghi/rpabemus/wiki/Input-data#split-pileup-and-pabs-data-by-chromosome">here</a>. <br /> <br /> The structure of the <code>outdir</code> folder will be:</p>
+<pre><code>Abemus_analysis/
+   BaseErrorModel/
+      pbem_tab.RData
+      bperr_summary.RData
+      pbem_background.RData
+      afgtz.tsv
+      afz.RData
+   Controls/
+      datathreshold.RData
+      minaf_cov_corrected.RData
+   Results/
+      TUMOR_id
+         pmtab_F1_TUMOR_id.tsv
+         pmtab_F2_TUMOR_id.tsv
+         pmtab_F3_TUMOR_id.tsv
+         pmtab_F3_R_TUMOR_id.tsv
+         pmtab_F3_optimalR_TUMOR_id.tsv
+      ...</code></pre>
+<div id="compute-the-per-base-error-model" class="section level3">
+<h3>1. Compute the per-base error model</h3>
+<p>Control samples listed in the <code>sample.info.file</code> are used to compute the GSE distribution, the coverage-based GSE distributions and the per-base error model.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">outpbem &lt;-<span class="st"> </span><span class="kw">compute_pbem</span>(<span class="dt">sample.info.file =</span> sample.info.file,</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">                        <span class="dt">af_max_to_compute_pbem =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">                        <span class="dt">coverage_min_to_compute_pbem =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">                        <span class="dt">coverage_binning =</span> <span class="dv">50</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">                        <span class="dt">af_max_to_compute_thresholds =</span> <span class="fl">0.2</span>,</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">                        <span class="dt">coverage_min_to_compute_thresholds =</span> <span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">                        <span class="dt">targetbed =</span> targetbed,</a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">                        <span class="dt">outdir =</span> outdir,</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">                        <span class="dt">pacbamfolder_bychrom =</span> pacbamfolder_bychrom)</a>
+<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co"># outs</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="kw">head</span>( outpbem<span class="op">$</span>pbem_tab )</a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">outpbem<span class="op">$</span>bperr_summary</a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">outpbem<span class="op">$</span>bgpbem</a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">outpbem<span class="op">$</span>mean_pbem</a>
+<a class="sourceLine" id="cb3-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co"># info and params</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">?<span class="kw">compute_pbem</span>()</a></code></pre></div>
+<p>By using this setting (default), the per-base error model will be computed using only positions with allelic fraction &lt; 0.2 (<code>af_max_to_compute_pbem</code>) and coverage &gt; 10 (<code>coverage_min_to_compute_pbem</code>). Similarly, the GSE distribution will be built using only positions with allelic fraction &lt; 0.2 (<code>af_max_to_compute_thresholds</code>) and coverage &gt; 10 (<code>coverage_min_to_compute_thresholds</code>). Coverage-dependent GSE distributions are computed by grouping together positions accordingly with the <code>coverage_binning</code> parameter.</p>
+<p><code>outpbem$pbem_tab</code> : The main output is a data frame reporting for each targeted position the coverage information collected across the set of control samples (i.e. total coverage, number of reads supporting the reference and alternative alleles). column <code>bperr</code> indicates the per-base sequencing error observed at that position.<br /> <code>outpbem$bperr_summary</code> : The <code>summary()</code> of the per-base sequencing error distribution.<br /> <code>outpbem$bperr_tabstat</code> : The background per-base sequencing error values.<br /> Data for GSE distributions are saved in files <code>afgtz.tsv</code> and <code>afz.RData</code> and stored in the default out folder <code>file.path( outdir, &quot;BaseErrorModel&quot; )</code>.<br /> &gt; All outs from the <code>compute_pbem()</code> function are automatically saved as <code>.RData</code> or tab-delimited files in the default out folder <code>file.path( outdir, &quot;BaseErrorModel&quot; )</code>. You can indicate the name of a different out folder using the parameter <code>outdir.bperr.name</code>, so that your outputs will be in <code>file.path( outdir, outdir.bperr.name )</code>.</p>
+</div>
+<div id="compute-allelic-fraction-thresholds" class="section level3">
+<h3>2. Compute allelic fraction thresholds</h3>
+<p>Data created in <code>step 1</code> are used here to compute allelic fractions thresholds. The <code>compute_afthreshold()</code> function will look for <code>afgtz.tsv</code> and <code>afz.RData</code> data in the <code>pbem_dir</code> (as for <code>step 1</code> the default directory is <code>file.path(outdir,&quot;BaseErrorModel&quot;)</code>, indicate a different path if you want to use a different folder).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">outafth &lt;-<span class="st"> </span><span class="kw">compute_afthreshold</span>(<span class="dt">outdir =</span> outdir,</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">                               <span class="dt">pbem_dir =</span> <span class="kw">file.path</span>(outdir,<span class="st">&quot;BaseErrorModel&quot;</span>),</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">                               <span class="dt">coverage_binning =</span> <span class="dv">50</span>) <span class="co"># ! the same used in compute_pbem()</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co"># outs</span></a>
+<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="kw">head</span>( outafth<span class="op">$</span>th_results )</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="kw">head</span>( outafth<span class="op">$</span>th_results_bin )</a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co"># info and params</span></a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">?<span class="kw">compute_afthreshold</span>()</a></code></pre></div>
+<p><code>outafth$th_results</code> : The array of coverage-independent allelic fraction thresholds. Each value of the array is an allelic fraction threshold computed using a range of detection specifities (<code>names( outafth$th_results )</code>).<br />
+<code>outafth$th_results_bin</code> : The matrix of detection.specifity x bins_of_coverage. Each value is the coverage-dependent allelic fraction threshold to use given the coverage of a position and a desired <code>detection.specificity</code>.<br /><br />
+&gt; All outs from the <code>compute_afthreshold()</code> function are automatically saved as <code>datathreshold.RData</code> file in the default out folder <code>file.path( outdir, &quot;Controls&quot; )</code>. You can indicate the name of a different out folder using the parameter <code>outdir.afth.name</code>, so that your outputs will be in <code>file.path( outdir, outdir.afth.name )</code>.</p>
+</div>
+<div id="call-somatic-snvs-in-tumor-samples" class="section level3">
+<h3>3. Call somatic snvs in tumor samples</h3>
+<p>Tumor samples listed in the sample sample.info.file are here investigated to look for somatic snvs. The <code>callsnvs()</code> uses data generated in <code>step 1</code>, <code>step 2</code>. Indicate the <code>pbem_dir</code> and the <code>controls_dir</code> accordingly with data that you want to use for the <code>step 3</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">calls &lt;-<span class="st"> </span><span class="kw">callsnvs</span>(<span class="dt">sample.info.file =</span> sample.info.file,</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">                  <span class="dt">controls_dir =</span> <span class="kw">file.path</span>(outdir,<span class="st">&quot;Controls&quot;</span>),</a>
+<a class="sourceLine" id="cb5-3" data-line-number="3">                  <span class="dt">pbem_dir =</span> <span class="kw">file.path</span>(outdir,<span class="st">&quot;BaseErrorModel&quot;</span>),</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">                  <span class="dt">detection.specificity =</span> <span class="fl">0.995</span>,</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5">                  <span class="dt">outdir=</span>outdir,</a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">                  <span class="dt">outdir.calls.name =</span> <span class="st">&quot;Results&quot;</span>,</a>
+<a class="sourceLine" id="cb5-7" data-line-number="7">                  <span class="dt">targetbed =</span> targetbed,</a>
+<a class="sourceLine" id="cb5-8" data-line-number="8">                  <span class="dt">pacbamfolder_bychrom=</span>pacbamfolder_bychrom)</a>
+<a class="sourceLine" id="cb5-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb5-10" data-line-number="10"><span class="kw">head</span>( calls<span class="op">$</span>tabsnvs_index )</a>
+<a class="sourceLine" id="cb5-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb5-12" data-line-number="12"><span class="co"># info and params</span></a>
+<a class="sourceLine" id="cb5-13" data-line-number="13">?<span class="kw">callsnvs</span>()</a></code></pre></div>
+<p>First, custom filtering criteria are applied to the per-base pileup data. For example, by default only positions with coverage &gt; 10 in tumor sample are considered in the next steps. Find out more details about custom params <code>mincov</code>, <code>mincovgerm</code>, <code>minalt</code> and <code>maxafgerm</code> by using <code>?callsnvs()</code>. Positions passing first filtering criteria are saved in the tab-delimited table <code>pmtab_F1_CASE_id.tsv</code>.<br /> Second, coverage-dependent allelic fraction thresholds (<code>AFbycov = TRUE</code> by default) computed in <code>step 2</code> are applied on positions included in <code>pmtab_F1_CASE_id.tsv</code>. Positions passing also the allelic fraction based filtering criteria are saved in the tab-delimited table <code>pmtab_F2_CASE_id.tsv</code>.<br /> Third, each retained position is annotated with the corresponding <code>bperr</code> and the <code>filter.pbem_coverage</code> value is computed considering its coverage. The annotated (<em>but not filtered</em>) table is saved as <code>pmtab_F3_CASE_id.tsv</code>.<br /><br />
+<code>calls$tabsnvs_index</code> : The <code>sample.info.file</code> with 3 additional columns indicating for each tumor sample the path to <code>pmtab_F1_CASE_id.tsv</code>, <code>pmtab_F2_CASE_id.tsv</code> and <code>pmtab_F3_CASE_id.tsv</code>, respectively. &gt; All outs from the <code>callsnvs()</code> function are automatically saved as tab-delimited files in the default out folder <code>file.path( outdir, &quot;Results&quot; )</code>. You can indicate the name of a different out folder using the parameter <code>outdir.calls.name</code>, so that your outputs will be in <code>file.path( outdir, outdir.calls.name )</code>.</p>
+</div>
+<div id="filter-somatic-snvs-using-the-per-base-error-model" class="section level3">
+<h3>4. Filter somatic snvs using the per-base error model</h3>
+<p>For each <code>pmtab_F3_CASE_id.tsv</code> table listed in the <code>tabindex</code> data frame, the <code>apply_scaling_factor()</code> function adjusts, as specified by the factor <code>R</code>, and applies the <code>bperr</code>-based filter (column <code>filter.pbem_coverage</code> in <code>pmtab_F3_CASE_id.tsv</code>) to get the final list of putative somatic snvs that will be saved in table <code>pmtab_F3_R_CASE_id.tsv</code>.<br /> There are two options to filter the <code>pmtab_F3_CASE_id.tsv</code> using the <code>apply_scaling_factor()</code> function.</p>
+</div>
+<div id="option-1-custom-factor-r" class="section level3">
+<h3>option 1 : custom factor R</h3>
+<p>You can select a custom scaling factor <code>R</code> (default: <code>R = 1</code>). The higher the scaling factor the higher is the cut-off applied.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="co"># option 1</span></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3">tabindex &lt;-<span class="st"> </span>calls<span class="op">$</span>tabsnvs_index</a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb6-5" data-line-number="5">calls<span class="op">$</span>tabsnvs_index_scalfact &lt;-<span class="st"> </span><span class="kw">apply_scaling_factor</span>(<span class="dt">tabindex =</span> tabindex,</a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">                                                     <span class="dt">R =</span> <span class="fl">0.5</span> )</a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="kw">head</span>( calls<span class="op">$</span>tabsnvs_index_scalfact )</a></code></pre></div>
+<p><code>calls$tabsnvs_index_scalfact</code> : in <code>option 1</code> the function will return the <code>tabindex</code> data frame with 1 additional column indicating for each tumor sample the path to the filtered table <code>pmtab_F3_[R]_CASE_id.tsv</code> by using the specified factor <code>R</code></p>
+</div>
+<div id="option-2-optimal-factor-r" class="section level3">
+<h3>option 2 : optimal factor R</h3>
+<p><code>rpabemus</code> enables the automatic selection of the R factor (among the ones generated from optimisation analysis) that best fits the case sample’s mean coverage and target size.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co"># option 2</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">tabindex &lt;-<span class="st"> </span>calls<span class="op">$</span>tabsnvs_index</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co"># compute case samples mean coverage</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6">tabindex &lt;-<span class="st"> </span><span class="kw">get_case_mean_coverage</span>(<span class="dt">tabindex =</span> tabindex,</a>
+<a class="sourceLine" id="cb7-7" data-line-number="7">                                   <span class="dt">pacbamfolder_bychrom =</span> pacbamfolder_bychrom)</a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co"># compute target size</span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10">target_size &lt;-<span class="st"> </span><span class="kw">get_target_size</span>(<span class="dt">targetbed =</span> targetbed, <span class="dt">Mbp =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12">calls<span class="op">$</span>tabsnvs_index_scalfact &lt;-<span class="st"> </span><span class="kw">apply_scaling_factor</span>(<span class="dt">tabindex =</span> tabindex,</a>
+<a class="sourceLine" id="cb7-13" data-line-number="13">                                                     <span class="dt">target_size =</span> target_size,</a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">                                                     <span class="dt">use.optimal.R =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb7-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb7-16" data-line-number="16"><span class="kw">head</span>( calls<span class="op">$</span>tabsnvs_index_scalfact )</a>
+<a class="sourceLine" id="cb7-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb7-18" data-line-number="18"><span class="co"># info and params</span></a>
+<a class="sourceLine" id="cb7-19" data-line-number="19">?<span class="kw">apply_scaling_factor</span>()</a></code></pre></div>
+<p><code>calls$tabsnvs_index_scalfact</code> : in <code>option 2</code> the function will return the <code>tabindex</code> table with 2 additional columns indicating for each tumor sample the path to the filtered table <code>pmtab_F3_optimalR_CASE_id.tsv</code> (column <code>tabcalls_f3_optimalR</code>) by using the optimal scaling factor <code>R</code> as reported in the column <code>tabcalls_f3_optimalR_used</code>.</p>
+<blockquote>
+<p>In both options, all outs from the apply_scaling_factor() function are automatically saved as tab-delimited files in the same folder where original <code>pmtab_F3_CASE_id.tsv</code> tables are located as indicated in the <code>tabindex</code> data frame.</p>
+</blockquote>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
