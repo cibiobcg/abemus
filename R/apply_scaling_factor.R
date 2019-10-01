@@ -1,4 +1,5 @@
-#' apply_scaling_factor
+#' Apply the scaling factor R on the pbem
+#'
 #' @export
 #' @param tabindex output from callsnvs(). (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())
 #' @param R scaling factor to be applied at filter.pbem_coverage value. default = 1
