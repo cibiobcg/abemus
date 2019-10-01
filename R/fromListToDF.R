@@ -1,8 +1,3 @@
-#' fromListToDF
-#'
-#' @author Davide Prandi
-#' @param inputlist list to merge
-#' @return data.frame
 fromListToDF <- function(inputList){
   if (is.null(inputList)){return(NULL)}
   #check if some is null and remove

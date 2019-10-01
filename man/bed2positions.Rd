@@ -9,7 +9,7 @@ bed2positions(targetbed, chrom_to_extract, get_only_chromosomes = F)
 \arguments{
 \item{targetbed}{Genomic regions in the BED tab-delimited format.}
 
-\item{chrom_to_extract}{the chromosome name to extract as i.e. "chr1"}
+\item{chrom_to_extract}{the chromosome name to extract as i.e. "chr1" or "1" accordingly with BED file annotation}
 
 \item{get_only_chromosomes}{return only the list of chromosomes in the BED file. default: FALSE}
 }
