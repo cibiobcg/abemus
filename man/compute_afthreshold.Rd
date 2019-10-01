@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_afthreshold.R
 \name{compute_afthreshold}
 \alias{compute_afthreshold}
-\title{compute_afthreshold}
+\title{Compute Allelic Fraction thresholds}
 \usage{
 compute_afthreshold(outdir, pbem_dir = file.path(outdir,
   "BaseErrorModel"), outdir.afth.name = "Controls",
@@ -23,5 +23,5 @@ compute_afthreshold(outdir, pbem_dir = file.path(outdir,
 allelic fraction thresholds
 }
 \description{
-compute_afthreshold
+Compute Allelic Fraction thresholds
 }

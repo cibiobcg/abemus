@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_target_size.R
 \name{get_target_size}
 \alias{get_target_size}
-\title{get_target_size}
+\title{Compute total number of loci covered in a BED file}
 \usage{
 get_target_size(targetbed, Mbp = TRUE)
 }
@@ -15,5 +15,5 @@ get_target_size(targetbed, Mbp = TRUE)
 Mbp covered in the BED file
 }
 \description{
-get_target_size
+Compute total number of loci covered in a BED file
 }

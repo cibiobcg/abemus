@@ -2,7 +2,7 @@
 % Please edit documentation in R/split_pacbam_bychrom.R
 \name{split_pacbam_bychrom}
 \alias{split_pacbam_bychrom}
-\title{split_pacbam_bychrom}
+\title{Split PaCBAM ouputs by chromosomes}
 \usage{
 split_pacbam_bychrom(targetbed, pacbamfolder, mc.cores = 1,
   pacbamfolder_bychrom)
@@ -17,5 +17,5 @@ split_pacbam_bychrom(targetbed, pacbamfolder, mc.cores = 1,
 \item{pacbamfolder_bychrom}{Output folder in which subfolders for each sample will be created.}
 }
 \description{
-split_pacbam_bychrom
+Split PaCBAM ouputs by chromosomes
 }

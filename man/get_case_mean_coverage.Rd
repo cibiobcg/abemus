@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_case_mean_coverage.R
 \name{get_case_mean_coverage}
 \alias{get_case_mean_coverage}
-\title{get_case_mean_coverage}
+\title{Compute the mean coverage of a case sample}
 \usage{
 get_case_mean_coverage(tabindex, pacbamfolder_bychrom)
 }
@@ -15,5 +15,5 @@ get_case_mean_coverage(tabindex, pacbamfolder_bychrom)
 sample.info.file with 1 additional column reporting the mean coverage for each case having a matched-control
 }
 \description{
-get_case_mean_coverage
+Compute the mean coverage of a case sample
 }

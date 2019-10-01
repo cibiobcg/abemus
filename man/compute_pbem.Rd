@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_pbem.R
 \name{compute_pbem}
 \alias{compute_pbem}
-\title{compute_pbem}
+\title{Compute per-base error model on each targeted position and save AFs by bins of coverage}
 \usage{
 compute_pbem(sample.info.file, targetbed, pacbamfolder_bychrom, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,

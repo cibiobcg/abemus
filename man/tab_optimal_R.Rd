@@ -3,12 +3,12 @@
 \docType{data}
 \name{tab_optimal_R}
 \alias{tab_optimal_R}
-\title{tab_optimal_R}
+\title{[data] Summary table to select the best scaling factor R}
 \format{An object of class \code{data.frame} with 40 rows and 3 columns.}
 \usage{
 tab_optimal_R
 }
 \description{
-Summary table to select the best scaling factor R
+[data] Summary table to select the best scaling factor R
 }
 \keyword{datasets}

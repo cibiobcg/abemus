@@ -2,7 +2,7 @@
 % Please edit documentation in R/callsnvs.R
 \name{callsnvs}
 \alias{callsnvs}
-\title{callsnvs}
+\title{Call somatic SNVs by using both global and local error models}
 \usage{
 callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
   pbem_dir = file.path(outdir, "BaseErrorModel"),
@@ -51,5 +51,5 @@ callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
 \item{chrom.in.parallel}{number of chromosomes to run in parallel. default: 1}
 }
 \description{
-callsnvs
+Call somatic SNVs by using both global and local error models
 }

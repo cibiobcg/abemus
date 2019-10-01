@@ -2,7 +2,7 @@
 % Please edit documentation in R/bed2positions.R
 \name{bed2positions}
 \alias{bed2positions}
-\title{bed2positions}
+\title{From BED format file to a list of loci}
 \usage{
 bed2positions(targetbed, chrom_to_extract, get_only_chromosomes = F)
 }
@@ -19,5 +19,5 @@ PosByChrom A list of data.frames, each for each chromosome.
 chromosomes The chromosomes included in the BED file.
 }
 \description{
-bed2positions
+From BED format file to a list of loci
 }
