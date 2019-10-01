@@ -3,12 +3,12 @@
 \docType{data}
 \name{bombanel_tab_cov_pbem}
 \alias{bombanel_tab_cov_pbem}
-\title{bombanel_tab_cov_pbem}
+\title{[data] Matrix of pbem thresholds}
 \format{An object of class \code{matrix} with 1999 rows and 218 columns.}
 \usage{
 bombanel_tab_cov_pbem
 }
 \description{
-Matrix coverage_levels x pbem from simulated data
+[data] Matrix of pbem thresholds
 }
 \keyword{datasets}

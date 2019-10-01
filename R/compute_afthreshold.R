@@ -1,5 +1,4 @@
-#' compute_afthreshold
-#'
+#' Compute Allelic Fraction thresholds
 #' @export
 #' @param outdir output folder for this step analysis
 #' @param pbem_dir folder with pbem data. default: file.path(outdir, "BaseErrorModel")

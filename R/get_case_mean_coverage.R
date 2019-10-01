@@ -1,4 +1,4 @@
-#' get_case_mean_coverage
+#' Compute the mean coverage of a case sample
 #' @param tabindex output calls$tabsnvs_index from callsnvs() function.
 #' @param pacbamfolder_bychrom folder with pileups split by chromosome.
 #' @return sample.info.file with 1 additional column reporting the mean coverage for each case having a matched-control

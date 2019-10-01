@@ -2,7 +2,7 @@
 % Please edit documentation in R/apply_scaling_factor.R
 \name{apply_scaling_factor}
 \alias{apply_scaling_factor}
-\title{apply_scaling_factor}
+\title{Apply the scaling factor R on the pbem}
 \usage{
 apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE,
   target_size = NA)
@@ -17,5 +17,5 @@ apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE,
 \item{target_size}{(if use.optimal.R = TRUE) target size in Mb of the BED file. Use get_target_size()}
 }
 \description{
-apply_scaling_factor
+Apply the scaling factor R on the pbem
 }

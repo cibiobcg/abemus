@@ -1,5 +1,4 @@
-#' callsnvs
-#'
+#' Call somatic SNVs by using both global and local error models
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
 #' @param targetbed targeted regions in BED format.
 #' @param pacbamfolder_bychrom folder with pileups

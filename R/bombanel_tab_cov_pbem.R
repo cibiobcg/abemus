@@ -1,6 +1,4 @@
-#' bombanel_tab_cov_pbem
-#'
-#' Matrix coverage_levels x pbem from simulated data
+#' [data] Matrix of pbem thresholds
 #'
 #' @docType data
 "bombanel_tab_cov_pbem"

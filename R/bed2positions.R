@@ -1,4 +1,4 @@
-#' bed2positions
+#' From BED format file to a list of loci
 #' @param targetbed Genomic regions in the BED tab-delimited format.
 #' @param get_only_chromosomes return only the list of chromosomes in the BED file. default: FALSE
 #' @param chrom_to_extract the chromosome name to extract as i.e. "chr1" or "1" accordingly with BED file annotation

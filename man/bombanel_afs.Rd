@@ -3,12 +3,12 @@
 \docType{data}
 \name{bombanel_afs}
 \alias{bombanel_afs}
-\title{bombanel_afs}
+\title{[data] Allelic Fractions from simulated data}
 \format{An object of class \code{numeric} of length 218.}
 \usage{
 bombanel_afs
 }
 \description{
-Allelic Fractions from simulated data
+[data] Allelic Fractions from simulated data
 }
 \keyword{datasets}

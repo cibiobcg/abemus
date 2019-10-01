@@ -3,12 +3,12 @@
 \docType{data}
 \name{bombanel_covs}
 \alias{bombanel_covs}
-\title{bombanel_covs}
+\title{[data] Coverage levels from simulated data}
 \format{An object of class \code{numeric} of length 1999.}
 \usage{
 bombanel_covs
 }
 \description{
-Coverage levels from simulated data
+[data] Coverage levels from simulated data
 }
 \keyword{datasets}

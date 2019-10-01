@@ -1,5 +1,3 @@
-#' compute_pbem
-#'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export
 #' @param sample.info.file sample info file listing cases and controls. tab-delimeted file

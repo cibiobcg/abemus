@@ -1,4 +1,4 @@
-#' get_target_size
+#' Compute total number of loci covered in a BED file
 #' @param targetbed targeted regions in BED format
 #' @param Mbp return count as Mbp. default: TRUE
 #' @return Mbp covered in the BED file
