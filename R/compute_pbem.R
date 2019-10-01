@@ -1,4 +1,4 @@
-#' Compute pbem
+#' compute_pbem
 #'
 #' Compute per-base error model on each targeted position and save AFs by bins of coverage
 #' @export

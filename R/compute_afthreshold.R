@@ -1,4 +1,4 @@
-#' Compute afthresholds
+#' compute_afthreshold
 #'
 #' @export
 #' @param outdir output folder for this step analysis

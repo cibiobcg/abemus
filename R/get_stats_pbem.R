@@ -1,8 +1,3 @@
-# get pbem statistics
-#
-# @param dt completetab_dbsnp as data.table
-# @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
-# @return out data.table
 get_stats_pbem <- function(dt,n_pos_af_th){
   ids <- unique(dt$group)
   m <- matrix(nrow = length(ids),ncol = 12,data = 0,dimnames = list(ids))
