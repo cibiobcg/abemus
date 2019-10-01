@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_pbem.R
 \name{compute_pbem}
 \alias{compute_pbem}
-\title{Compute pbem}
+\title{compute_pbem}
 \usage{
 compute_pbem(sample.info.file, targetbed, pacbamfolder_bychrom, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,
