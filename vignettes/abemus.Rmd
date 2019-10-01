@@ -1,0 +1,164 @@
+---
+title: "ABEMUS: Adaptive Base Error Model for Ultra-deep Sequencing data"
+author: "Nicola Casiraghi"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ABEMUS: Adaptive Base Error Model for Ultra-deep Sequencing data}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+## Computational workflow
+In [`step 1`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#1-compute-the-per-base-error-model) and [`step 2`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#2-compute-allelic-fraction-thresholds) only **control samples** are used to build the per-base error model and compute both coverage-dependent and coverage-independent allelic fraction thresholds. In [`step 3`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#3-call-somatic-snvs-in-case-samples) **tumor samples** are inspected and somatic snvs are called based on both custom filtering criteria (i.e. minimum coverage, minimum number of reads supporting an alternative allele) and allelic fraction thresholds. Then in [`step 4`](https://github.com/ncasiraghi/rpabemus/wiki/Usage#4-filter-somatic-snvs-using-the-per-base-error-model), the per-base error model computed in `step 1` is exploited to further refine the final set of putative somatic snvs. Finally, output table with snvs calls can be formatted to get functional annotations by external tools (i.e. [Oncotator](https://portals.broadinstitute.org/oncotator/)).<br/>
+> The described workflow can be found in [test_example.R](https://github.com/ncasiraghi/rpabemus/blob/master/test_example.R) and you can run it on the [test dataset](https://github.com/cibiobcg/abemus_models#test-dataset).<br/>  
+
+Since the following inputs are used in all the main steps, you can initialise them just once at the beginning of your script:  
+```R
+# inputs
+outdir <-  "/my_project/Abemus_analysis/"
+sample.info.file <- "/my_project/info/sample_info_file.tsv"
+targetbed <- "/my_project/info/regions.bed"
+pacbamfolder_bychrom <- "/my_project/data/PaCBAM_outdir_bychrom"
+```
+`outdir` : The main directory that will be populated with subfolders and data files generated during each step.<br/> 
+`targetbp` : The folder where you created `TargetPositions_chr.RData` data as described [here]    
+`sample_info_file.tsv` : The info file formatted as described [here](https://github.com/ncasiraghi/rpabemus/wiki/Input-data#sample-info-file).<br/>
+`pacbamfolder_bychrom` : The path to the folder where you created the per-base pileup data split by chromosome for each sample as described [here](https://github.com/ncasiraghi/rpabemus/wiki/Input-data#split-pileup-and-pabs-data-by-chromosome).
+<br/>
+<br/>
+The structure of the `outdir` folder will be:
+```
+Abemus_analysis/
+   BaseErrorModel/
+      pbem_tab.RData
+      bperr_summary.RData
+      pbem_background.RData
+      afgtz.tsv
+      afz.RData
+   Controls/
+      datathreshold.RData
+      minaf_cov_corrected.RData
+   Results/
+      TUMOR_id
+         pmtab_F1_TUMOR_id.tsv
+         pmtab_F2_TUMOR_id.tsv
+         pmtab_F3_TUMOR_id.tsv
+         pmtab_F3_R_TUMOR_id.tsv
+         pmtab_F3_optimalR_TUMOR_id.tsv
+      ...
+```
+
+### 1. Compute the per-base error model
+Control samples listed in the `sample.info.file` are used to compute the GSE distribution, the coverage-based GSE distributions and the per-base error model.
+```R
+outpbem <- compute_pbem(sample.info.file = sample.info.file,
+                        af_max_to_compute_pbem = 0.2,
+                        coverage_min_to_compute_pbem = 10,
+                        coverage_binning = 50,
+                        af_max_to_compute_thresholds = 0.2,
+                        coverage_min_to_compute_thresholds = 10,
+                        targetbed = targetbed,
+                        outdir = outdir,
+                        pacbamfolder_bychrom = pacbamfolder_bychrom)
+# outs
+head( outpbem$pbem_tab )
+outpbem$bperr_summary
+outpbem$bgpbem
+outpbem$mean_pbem
+
+# info and params
+?compute_pbem()
+```
+By using this setting (default), the per-base error model will be computed using only positions with allelic fraction < 0.2 (`af_max_to_compute_pbem`) and coverage > 10 (`coverage_min_to_compute_pbem`). Similarly, the GSE distribution will be built using only positions with allelic fraction < 0.2 (`af_max_to_compute_thresholds`) and coverage > 10 (`coverage_min_to_compute_thresholds`). Coverage-dependent GSE distributions are computed by grouping together positions accordingly with the `coverage_binning` parameter.    
+
+`outpbem$pbem_tab` : The main output is a data frame reporting for each targeted position the coverage information collected across the set of control samples (i.e. total coverage, number of reads supporting the reference and alternative alleles). column `bperr` indicates the per-base sequencing error observed at that position.<br/>
+`outpbem$bperr_summary` : The `summary()` of the per-base sequencing error distribution.<br/>
+`outpbem$bperr_tabstat` : The background per-base sequencing error values.<br/>
+Data for GSE distributions are saved in files `afgtz.tsv` and `afz.RData` and stored in the default out folder `file.path( outdir, "BaseErrorModel" )`.<br/>
+> All outs from the `compute_pbem()` function are automatically saved as `.RData` or tab-delimited files in the default out folder `file.path( outdir, "BaseErrorModel" )`. You can indicate the name of a different out folder using the parameter `outdir.bperr.name`, so that your outputs will be in `file.path( outdir, outdir.bperr.name )`.
+
+### 2. Compute allelic fraction thresholds
+Data created in `step 1` are used here to compute allelic fractions thresholds. The `compute_afthreshold()` function will look for `afgtz.tsv` and `afz.RData` data in the `pbem_dir` (as for `step 1` the default directory is `file.path(outdir,"BaseErrorModel")`, indicate a different path if you want to use a different folder).
+```R
+outafth <- compute_afthreshold(outdir = outdir,
+                               pbem_dir = file.path(outdir,"BaseErrorModel"),
+                               coverage_binning = 50) # ! the same used in compute_pbem()
+
+# outs
+head( outafth$th_results )
+head( outafth$th_results_bin )
+
+# info and params
+?compute_afthreshold()
+```
+`outafth$th_results` : The array of coverage-independent allelic fraction thresholds. Each value of the array is an allelic fraction threshold computed using a range of detection specifities (`names( outafth$th_results )`).    
+`outafth$th_results_bin` : The matrix of detection.specifity x bins_of_coverage. Each value is the coverage-dependent allelic fraction threshold to use given the coverage of a position and a desired `detection.specificity`.<br/>  
+> All outs from the `compute_afthreshold()` function are automatically saved as `datathreshold.RData` file in the default out folder `file.path( outdir, "Controls" )`. You can indicate the name of a different out folder using the parameter `outdir.afth.name`, so that your outputs will be in `file.path( outdir, outdir.afth.name )`.
+
+### 3. Call somatic snvs in tumor samples
+Tumor samples listed in the sample sample.info.file are here investigated to look for somatic snvs. The `callsnvs()` uses data generated in `step 1`, `step 2`. Indicate the `pbem_dir` and the `controls_dir` accordingly with data that you want to use for the `step 3`.     
+```R
+calls <- callsnvs(sample.info.file = sample.info.file,
+                  controls_dir = file.path(outdir,"Controls"),
+                  pbem_dir = file.path(outdir,"BaseErrorModel"),
+                  detection.specificity = 0.995,
+                  outdir=outdir,
+                  outdir.calls.name = "Results",
+                  targetbed = targetbed,
+                  pacbamfolder_bychrom=pacbamfolder_bychrom)
+
+head( calls$tabsnvs_index )
+
+# info and params
+?callsnvs()
+```
+First, custom filtering criteria are applied to the per-base pileup data. For example, by default only positions with coverage > 10 in tumor sample are considered in the next steps. Find out more details about custom params `mincov`, `mincovgerm`, `minalt` and `maxafgerm` by using `?callsnvs()`. Positions passing first filtering criteria are saved in the tab-delimited table `pmtab_F1_CASE_id.tsv`.<br/>
+Second, coverage-dependent allelic fraction thresholds (`AFbycov = TRUE` by default) computed in `step 2` are applied on positions included in `pmtab_F1_CASE_id.tsv`. Positions passing also the allelic fraction based filtering criteria are saved in the tab-delimited table `pmtab_F2_CASE_id.tsv`.<br/>
+Third, each retained position is annotated with the corresponding `bperr` and the `filter.pbem_coverage` value is computed considering its coverage. The annotated (_but not filtered_) table is saved as `pmtab_F3_CASE_id.tsv`.<br/>   
+`calls$tabsnvs_index` : The `sample.info.file` with 3 additional columns indicating for each tumor sample the path to `pmtab_F1_CASE_id.tsv`, `pmtab_F2_CASE_id.tsv` and `pmtab_F3_CASE_id.tsv`, respectively.
+> All outs from the `callsnvs()` function are automatically saved as tab-delimited files in the default out folder `file.path( outdir, "Results" )`. You can indicate the name of a different out folder using the parameter `outdir.calls.name`, so that your outputs will be in `file.path( outdir, outdir.calls.name )`.
+
+### 4. Filter somatic snvs using the per-base error model
+For each `pmtab_F3_CASE_id.tsv` table listed in the `tabindex` data frame, the `apply_scaling_factor()` function adjusts, as specified by the factor `R`, and applies the `bperr`-based filter (column `filter.pbem_coverage` in `pmtab_F3_CASE_id.tsv`) to get the final list of putative somatic snvs that will be saved in table `pmtab_F3_R_CASE_id.tsv`.<br/>
+There are two options to filter the `pmtab_F3_CASE_id.tsv` using the `apply_scaling_factor()` function.
+
+### option 1 : custom factor R 
+You can select a custom scaling factor `R` (default: `R = 1`). The higher the scaling factor the higher is the cut-off applied. 
+```R
+# option 1
+
+tabindex <- calls$tabsnvs_index
+
+calls$tabsnvs_index_scalfact <- apply_scaling_factor(tabindex = tabindex,
+                                                     R = 0.5 )
+
+head( calls$tabsnvs_index_scalfact )
+```
+`calls$tabsnvs_index_scalfact` : in `option 1` the function will return the `tabindex` data frame with 1 additional column indicating for each tumor sample the path to the filtered table `pmtab_F3_[R]_CASE_id.tsv` by using the specified factor `R`
+
+### option 2 : optimal factor R
+`rpabemus` enables the automatic selection of the R factor (among the ones generated from optimisation analysis) that best fits the case sample's mean coverage and target size. 
+```R
+# option 2
+
+tabindex <- calls$tabsnvs_index
+
+# compute case samples mean coverage
+tabindex <- get_case_mean_coverage(tabindex = tabindex,
+                                   pacbamfolder_bychrom = pacbamfolder_bychrom)
+
+# compute target size
+target_size <- get_target_size(targetbed = targetbed, Mbp = TRUE)
+
+calls$tabsnvs_index_scalfact <- apply_scaling_factor(tabindex = tabindex,
+                                                     target_size = target_size,
+                                                     use.optimal.R = TRUE,
+
+head( calls$tabsnvs_index_scalfact )
+
+# info and params
+?apply_scaling_factor()
+```
+`calls$tabsnvs_index_scalfact` : in `option 2` the function will return the `tabindex` table with 2 additional columns indicating for each tumor sample the path to the filtered table `pmtab_F3_optimalR_CASE_id.tsv` (column `tabcalls_f3_optimalR`) by using the optimal scaling factor `R` as reported in the column `tabcalls_f3_optimalR_used`.
+
+> In both options, all outs from the apply_scaling_factor() function are automatically saved as tab-delimited files in the same folder where original `pmtab_F3_CASE_id.tsv` tables are located as indicated in the `tabindex` data frame.
