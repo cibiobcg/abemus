@@ -4,7 +4,7 @@
 \name{abemus}
 \alias{abemus}
 \alias{abemus-package}
-\title{ABEMUS:  Adaptive per Base Error Model in Ultra-deep Sequencing data}
+\title{ABEMUS:  Adaptive per Base Error Model in Ultra-deep Sequencing Data}
 \description{
 The package abemus is a NGS-based computational method that uses control samples to build global and local sequencing error reference models that are then used to improve the detection of somatic SNVs in cfDNA samples.
 }
