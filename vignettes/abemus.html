@@ -13,7 +13,7 @@
 
 <meta name="author" content="Nicola Casiraghi" />
 
-<meta name="date" content="2019-10-01" />
+<meta name="date" content="2019-10-07" />
 
 <title>abemus</title>
 
@@ -304,14 +304,14 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">abemus</h1>
 <h4 class="author">Nicola Casiraghi</h4>
-<h4 class="date">2019-10-01</h4>
+<h4 class="date">2019-10-07</h4>
 
 
 
 <p><strong>ABEMUS</strong> (<em>Adaptive Base Error Model for Ultra-deep Sequencing data</em>) is a NGS-based computational method that uses control samples to build global and local sequencing error reference models that are then used to improve the detection of somatic SNVs in cfDNA samples.</p>
 <div id="computational-workflow" class="section level2">
 <h2>Computational workflow</h2>
-<p>In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#1-compute-the-per-base-error-model"><code>step 1</code></a> and <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#2-compute-allelic-fraction-thresholds"><code>step 2</code></a> only <strong>control samples</strong> are used to build the per-base error model and compute both coverage-dependent and coverage-independent allelic fraction thresholds. In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#3-call-somatic-snvs-in-case-samples"><code>step 3</code></a> <strong>tumor samples</strong> are inspected and somatic snvs are called based on both custom filtering criteria (i.e. minimum coverage, minimum number of reads supporting an alternative allele) and allelic fraction thresholds. Then in <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#4-filter-somatic-snvs-using-the-per-base-error-model"><code>step 4</code></a>, the per-base error model computed in <code>step 1</code> is exploited to further refine the final set of putative somatic snvs. Finally, output table with snvs calls can be formatted to get functional annotations by external tools (i.e. <a href="https://portals.broadinstitute.org/oncotator/">Oncotator</a>).<br /> &gt; The described workflow can be found in <a href="https://github.com/ncasiraghi/rpabemus/blob/master/test_example.R">test_example.R</a> and you can run it on the <a href="https://github.com/cibiobcg/abemus_models#test-dataset">test dataset</a>.<br /></p>
+<p>In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#1-compute-the-per-base-error-model"><code>step 1</code></a> and <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#2-compute-allelic-fraction-thresholds"><code>step 2</code></a> only <strong>control samples</strong> are used to build the per-base error model and compute both coverage-dependent and coverage-independent allelic fraction thresholds. In <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#3-call-somatic-snvs-in-case-samples"><code>step 3</code></a> <strong>tumor samples</strong> are inspected and somatic snvs are called based on both custom filtering criteria (i.e. minimum coverage, minimum number of reads supporting an alternative allele) and allelic fraction thresholds. Then in <a href="https://github.com/ncasiraghi/rpabemus/wiki/Usage#4-filter-somatic-snvs-using-the-per-base-error-model"><code>step 4</code></a>, the per-base error model computed in <code>step 1</code> is exploited to further refine the final set of putative somatic snvs. Finally, output table with snvs calls can be formatted to get functional annotations by external tools (i.e. Oncotator).<br /> &gt; The described workflow can be found in <a href="https://github.com/ncasiraghi/rpabemus/blob/master/test_example.R">test_example.R</a> and you can run it on the <a href="https://github.com/cibiobcg/abemus_models#test-dataset">test dataset</a>.<br /></p>
 <p>Since the following inputs are used in all the main steps, you can initialise them just once at the beginning of your script:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co"># inputs</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2">outdir &lt;-<span class="st">  &quot;/my_project/Abemus_analysis/&quot;</span></a>
