@@ -4,7 +4,7 @@
 # Data available at: https://github.com/cibiobcg/abemus_models#test-dataset
 
 library( devtools )
-devtools::install_github( "cibiobcg/abemus" )
+devtools::install_github("cibiobcg/abemus", build_vignettes = T)
 
 library( abemus )
 library( data.table )

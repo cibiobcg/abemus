@@ -10,4 +10,17 @@
 #
 #' @docType package
 #' @name abemus
+#' @import utils
+#' @import stats
+#' @import parallel
 NULL
+
+globalVariables(c("fread",
+                  "afz",
+                  "bgpbem",
+                  "bombanel_afs",
+                  "bombanel_covs",
+                  "bombanel_tab_cov_pbem",
+                  "datacount_bin",
+                  "tab_optimal_R",
+                  "th_results_bin"))
