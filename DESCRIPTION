@@ -1,9 +1,8 @@
 Package: abemus
 Type: Package
 Title: Adaptive Base Error Model in Ultra-Deep Sequencing Data
-Version: 0.1.0
-Author: Casiraghi et al. 2019
-Maintainer: [Nicola Casiraghi] <casiraghinicola@gmail.com>
+Version: 1.0.0
+Authors@R: c(person("Nicola", "Casiraghi", role=c("aut", "cre"), email="casiraghinicola@gmail.com"))
 Description: Platform specific and data informed detection of somatic SNVs in cfDNA.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
