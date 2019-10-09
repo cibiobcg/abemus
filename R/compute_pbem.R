@@ -77,7 +77,7 @@ compute_pbem <- function(sample.info.file,
   system(cmd.merge)
 
   # save counter of afz as RData
-  afztab = read.delim(file = "afz.tsv",sep="\t",as.is = T,header=F)
+  afztab = read.delim(file = "afz.tsv",sep="\t",as.is = TRUE,header=FALSE)
   afz = apply(afztab,2,sum)
   names(afz)=define_cov_bins(coverage_binning)[[2]]
   save(afz,file = "afz.RData",compress = T)
@@ -85,7 +85,7 @@ compute_pbem <- function(sample.info.file,
   # overall statistics on pbems
   cmd.merge = paste("cat bperr_*.tsv > bperr.tsv")
   system(cmd.merge)
-  pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5),data.table = F)
+  pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = FALSE,showProgress = FALSE,header = FALSE,colClasses = list(character=2,character=5),data.table = FALSE)
   header_pbem_tab <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")
   colnames( pbem_tab ) <- header_pbem_tab
   rownames( pbem_tab ) <- pbem_tab$group
@@ -97,10 +97,10 @@ compute_pbem <- function(sample.info.file,
   # compute background pbem
   bperr_subset <- pbem_tab[which(pbem_tab$n_pos_af_gth == 0),] # select only pos never > n_pos_af_gth
   bgpbem = (sum(as.numeric(bperr_subset$tot_reads_supporting_alt)))/(sum(as.numeric(bperr_subset$tot_coverage)))
-  mean_pbem = mean(as.numeric(bperr_subset$bperr),na.rm = T)
+  mean_pbem = mean(as.numeric(bperr_subset$bperr),na.rm = TRUE)
   save(bgpbem,mean_pbem,file = file.path(outdir, outdir.bperr.name,"pbem_background.RData"))
 
-  save(pbem_tab,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = T)
+  save(pbem_tab,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = TRUE)
 
   cat(paste("[",Sys.time(),"]\talright.","\n"))
   return(list(pbem_tab=pbem_tab,

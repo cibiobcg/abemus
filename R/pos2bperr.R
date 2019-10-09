@@ -27,33 +27,33 @@ pos2bperr = function(id,
                      n_pos_af_th){
   upto = id+step-1
   if(upto>nrow(targets)){upto <- nrow(targets)}
-  this = targets[id:upto,,drop=F]
+  this = targets[id:upto,,drop=FALSE]
   outfile = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"postogrep.txt",sep="_")
   filtpileup = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"filtered.pileup.txt",sep="_")
   taboutchrom = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"pbem.table.txt",sep="_")
   mytabafchrom = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"afgtz.table.txt",sep="_")
   afzchrom = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"afz.table.txt",sep="_")
   afz = array(data = 0,dim = length(lev),dimnames = list(lev))
-  cat(unique(this$pos),sep = "\n",file = outfile,append = F)
+  cat(unique(this$pos),sep = "\n",file = outfile,append = FALSE)
   cmd = paste0("awk -F'\t' '{if (FILENAME == \"",outfile,"\") { t[$1] = 1; } else { if (t[$2]) { print }}}' ",outfile," ",germlineset," > ",filtpileup)
   system(cmd)
   if(file.info(filtpileup)$size == 0){
     cat(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."),"\n")
   } else {
-    completetab_all = read.delim(filtpileup,stringsAsFactors = F,header = F,sep = "\t",na.strings = "")
+    completetab_all = read.delim(filtpileup,stringsAsFactors = FALSE,header = FALSE,sep = "\t",na.strings = "")
     names(completetab_all) <- c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD","dbsnp")
     # exclude annotated and private SNPs [ to compute AF threshold]
-    completetab = completetab_all[which(is.na(completetab_all$dbsnp)),,drop=F]
-    completetab = completetab[which(completetab$af <= af_max_to_compute_thresholds & completetab$RD >= coverage_min_to_compute_thresholds),,drop=F]
+    completetab = completetab_all[which(is.na(completetab_all$dbsnp)),,drop=FALSE]
+    completetab = completetab[which(completetab$af <= af_max_to_compute_thresholds & completetab$RD >= coverage_min_to_compute_thresholds),,drop=FALSE]
     # Compute pbem also in positions that are SNPs
-    completetab_dbsnp = completetab_all[which(completetab_all$af <= af_max_to_compute_pbem & completetab_all$RD >= coverage_min_to_compute_pbem),,drop=F]
+    completetab_dbsnp = completetab_all[which(completetab_all$af <= af_max_to_compute_pbem & completetab_all$RD >= coverage_min_to_compute_pbem),,drop=FALSE]
     if(nrow(completetab)>0){
       # save allelic fractions by bins of coverage
-      mytabaf = completetab[which(completetab$af > 0),,drop=F]
-      mytabz =  completetab[which(completetab$af == 0),,drop=F]
-      afz = afz + as.array(table(cut(mytabz$RD,breaks = covbin,include.lowest = T)))
-      write.table(t(afz),file = afzchrom,sep="\t",col.names = F,row.names = F,quote = F,append = F)
-      write.table(mytabaf[,8:9],file = mytabafchrom,append = F,sep = "\t",quote = F,row.names = F,col.names = F)
+      mytabaf = completetab[which(completetab$af > 0),,drop=FALSE]
+      mytabz =  completetab[which(completetab$af == 0),,drop=FALSE]
+      afz = afz + as.array(table(cut(mytabz$RD,breaks = covbin,include.lowest = TRUE)))
+      write.table(t(afz),file = afzchrom,sep="\t",col.names = FALSE,row.names = FALSE,quote = FALSE,append = FALSE)
+      write.table(mytabaf[,8:9],file = mytabafchrom,append = FALSE,sep = "\t",quote = FALSE,row.names = FALSE,col.names = FALSE)
 
       # compute pbem
       #completetab_dbsnp$group = paste(completetab_dbsnp$chr,completetab_dbsnp$pos,completetab_dbsnp$ref,sep=":")
@@ -85,7 +85,7 @@ pos2bperr = function(id,
       #tabstats <- tabstats[with(tabstats, order(pos)), ]
 
       cat(paste("[",Sys.time(),"]\twriting output for positions in: ",filtpileup),"\n")
-      write.table(tabstats,file = taboutchrom,append = F,quote = F,row.names = F,col.names = F,sep="\t")
+      write.table(tabstats,file = taboutchrom,append = FALSE,quote = FALSE,row.names = FALSE,col.names = FALSE,sep="\t")
     }
   }
   system(paste("rm",filtpileup,outfile))

@@ -7,25 +7,25 @@
 #' @export
 bed2positions <- function(targetbed,
                           chrom_to_extract,
-                          get_only_chromosomes = F){
+                          get_only_chromosomes = FALSE){
   if(get_only_chromosomes){
-    bed <- fread(input = targetbed,colClasses = list(character=1),data.table = F,stringsAsFactors = F,header = F)
+    bed <- fread(input = targetbed,colClasses = list(character=1),data.table = FALSE,stringsAsFactors = FALSE,header = FALSE)
     chromosomes <- sort(unique(bed$V1))
 
     return(list(chromosomes=chromosomes))
 
   } else {
-    bed <- fread(input = targetbed,colClasses = list(character=1),data.table = F,stringsAsFactors = F,header = F)
+    bed <- fread(input = targetbed,colClasses = list(character=1),data.table = FALSE,stringsAsFactors = FALSE,header = FALSE)
     bed$V2 <- bed$V2+1
     chromosomes <- sort(unique(bed$V1))
 
     unwrap <- function(x){return(seq.int(from = x[2],to = x[3]))}
 
-    bed_chrom <- bed[grep(bed$V1,pattern = chrom_to_extract),,drop=F]
+    bed_chrom <- bed[grep(bed$V1,pattern = chrom_to_extract),,drop=FALSE]
 
     PosByChrom <- data.frame(chr=chrom_to_extract,
                              pos=as.numeric(unlist( apply(bed_chrom, MARGIN=1,FUN = unwrap))),
-                             stringsAsFactors = F)
+                             stringsAsFactors = FALSE)
     #PosByChrom$group <- paste(PosByChrom$chr,PosByChrom$pos,sep=":")
 
     return(list(chromosomes=chromosomes, PosByChrom=PosByChrom))

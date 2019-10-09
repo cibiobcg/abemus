@@ -29,7 +29,7 @@ adjust_af_threshold_table <- function(controls_dir,
   if(file.exists(vafcov_file)){
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"),"\n")
     #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
-    vafcov = fread(input = vafcov_file,sep = "\t",header = F,stringsAsFactors = F,data.table = F)
+    vafcov = fread(input = vafcov_file,sep = "\t",header = FALSE,stringsAsFactors = FALSE,data.table = FALSE)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
     stop()
@@ -46,9 +46,9 @@ adjust_af_threshold_table <- function(controls_dir,
 
   # Find out most represented bin of coverage
   datacount_bin_complete <-  datacount_bin+afz
-  datacount_bin_complete <-  datacount_bin_complete[grep(pattern = "Inf",names(datacount_bin_complete),invert = T,value = T)]
+  datacount_bin_complete <-  datacount_bin_complete[grep(pattern = "Inf",names(datacount_bin_complete),invert = TRUE,value = TRUE)]
   #datacount_bin_complete <-  sort(datacount_bin_complete,decreasing = T) # sort by all
-  datacount_bin_complete <- datacount_bin_complete[names(sort(datacount_bin,decreasing = T))] # sort by AF>0
+  datacount_bin_complete <- datacount_bin_complete[names(sort(datacount_bin,decreasing = TRUE))] # sort by AF>0
   datacount_bin_complete <- datacount_bin_complete[which(datacount_bin_complete > 0)]
 
   stop = length(datacount_bin_complete)-1
@@ -57,7 +57,7 @@ adjust_af_threshold_table <- function(controls_dir,
 
   covbin <- define_cov_bins(coverage_binning)[[1]]
   lev <- define_cov_bins(coverage_binning)[[2]]
-  a <- cut(x = as.integer(vafcov[,2]),breaks = covbin,include.lowest = T)
+  a <- cut(x = as.integer(vafcov[,2]),breaks = covbin,include.lowest = TRUE)
 
   for(i in 1:stop){
     current.bin = names(datacount_bin_complete)[i]
@@ -80,11 +80,11 @@ adjust_af_threshold_table <- function(controls_dir,
                        this.detection.specificity=detection.specificity,
                        mc.cores = replicas.in.parallel)
         ReplicasTable = matrix(unlist(out),ncol = replicas)
-        coeffvar = apply(ReplicasTable,MARGIN = 1,FUN = sd,na.rm=T)/apply(ReplicasTable,MARGIN = 1,FUN = mean,na.rm=T)
+        coeffvar = apply(ReplicasTable,MARGIN = 1,FUN = sd,na.rm=TRUE)/apply(ReplicasTable,MARGIN = 1,FUN = mean,na.rm=TRUE)
         if(is.na(coeffvar)){
           coeffvar <- 0
         }
-        x = data.frame(current.bin=current.bin,next.bin=next.bin,coeffvar=as.numeric(coeffvar),median.afth=median(ReplicasTable,na.rm = T),last.stable.card=last.stable.card,stringsAsFactors = F)
+        x = data.frame(current.bin=current.bin,next.bin=next.bin,coeffvar=as.numeric(coeffvar),median.afth=median(ReplicasTable,na.rm = TRUE),last.stable.card=last.stable.card,stringsAsFactors = FALSE)
         tab=rbind(tab,x)
         if(coeffvar > coeffvar.threshold){
           last.stable.card = max(last.stable.card,next.bin.card)
@@ -94,7 +94,7 @@ adjust_af_threshold_table <- function(controls_dir,
     }
   }
   name.out = paste0("tab",replicas,"r_",detection.specificity,"_b.RData")
-  save(tab,file = file.path(controls_dir, name.out),compress = T)
+  save(tab,file = file.path(controls_dir, name.out),compress = TRUE)
 
   # correct the original threhsold table
   cat(paste("[",Sys.time(),"]\tcorrecting original afth table"),"\n")

@@ -25,7 +25,7 @@ compute_afthreshold <- function(outdir,
   if(file.exists(vafcov_file)){
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"),"\n")
     #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
-    vafcov = fread(input = vafcov_file,sep = "\t",header = F,stringsAsFactors = F,data.table = F)
+    vafcov = fread(input = vafcov_file,sep = "\t",header = FALSE,stringsAsFactors = FALSE,data.table = FALSE)
   } else {
     cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
     stop()
@@ -50,7 +50,7 @@ compute_afthreshold <- function(outdir,
   covbin <- define_cov_bins(coverage_binning)[[1]]
   lev <- define_cov_bins(coverage_binning)[[2]]
 
-  a <- cut(x = as.integer(vafcov[,2]),breaks = covbin,include.lowest = T)
+  a <- cut(x = as.integer(vafcov[,2]),breaks = covbin,include.lowest = TRUE)
   th_results_bin = data.frame(specificity = probs)
   datacount_bin = array(data = 0,dim = length(lev),dimnames = list(lev))
   for(l in lev){
@@ -70,7 +70,7 @@ compute_afthreshold <- function(outdir,
 
   cat(paste("[",Sys.time(),"]\tSaving threshold data\n"))
   #save(minaf,minaf_cov,th_results,th_results_bin,covbin,lev,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
-  save(th_results,th_results_bin,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
+  save(th_results,th_results_bin,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = TRUE)
 
   cat(paste("[",Sys.time(),"]\talright.","\n"))
   return(list(th_results=th_results,

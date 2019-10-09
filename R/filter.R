@@ -26,15 +26,15 @@ filter = function(i,
   chrom <- gsub(chrom,pattern = 'chr',replacement = '')
   # create chromsome sub-folder
   chromdir = file.path(caseout_folder,chrom)
-  dir.create(chromdir,showWarnings = T)
+  dir.create(chromdir,showWarnings = TRUE)
   setwd(chromdir)
   # import files
-  plasma_snvs = list.files(file.path(plasma.folder,"snvs"),pattern = paste0("_chr",chrom,".pabs"),full.names = T)
-  n.rows.plasma_snvs = as.numeric(unlist(strsplit(trimws(x = system(paste("wc -l",plasma_snvs),intern = T),which = "left"),split = " "))[[1]])
+  plasma_snvs = list.files(file.path(plasma.folder,"snvs"),pattern = paste0("_chr",chrom,".pabs"),full.names = TRUE)
+  n.rows.plasma_snvs = as.numeric(unlist(strsplit(trimws(x = system(paste("wc -l",plasma_snvs),intern = TRUE),which = "left"),split = " "))[[1]])
   if(n.rows.plasma_snvs == 1){
     return()
   }
-  snvs = fread(plasma_snvs,stringsAsFactors = F,showProgress = F,header = F,skip = 1,na.strings = "",colClasses = list(character=3,4,15),verbose = F)
+  snvs = fread(plasma_snvs,stringsAsFactors = FALSE,showProgress = FALSE,header = FALSE,skip = 1,na.strings = "",colClasses = list(character=3,4,15),verbose = FALSE)
   snvs = unique(snvs)
   snvs = data.frame(snvs)
   names(snvs)=c("chr","pos","ref","alt","A","C","G","T","af","cov","Ars","Crs","Grs","Trs","dbsnp")
@@ -47,9 +47,9 @@ filter = function(i,
                    snvs=snvs,
                    mc.cores = njobs)
   snvs <- fromListToDF(out)
-  snvs <- snvs[which(snvs$af > 0 ),,drop=F]
-  snvs <- snvs[which(snvs$cov >= mincov ),,drop=F]
-  snvs <- snvs[which(snvs$cov.alt >= minalt ),,drop=F]
+  snvs <- snvs[which(snvs$af > 0 ),,drop=FALSE]
+  snvs <- snvs[which(snvs$cov >= mincov ),,drop=FALSE]
+  snvs <- snvs[which(snvs$cov.alt >= minalt ),,drop=FALSE]
   snvs <- unique(snvs)
   if(nrow(snvs)==0){
     return()
@@ -59,17 +59,17 @@ filter = function(i,
 
     ctrl.pileup <- data.frame(chr=chrom,
                               pos=snvs$pos,
-                              ref=snvs$ref,stringsAsFactors = F)
+                              ref=snvs$ref,stringsAsFactors = FALSE)
     ctrl.pileup <- cbind(ctrl.pileup,NA,NA,NA,NA,NA,NA)
     names(ctrl.pileup)=c("chr","pos","ref","A","C","G","T","af","cov")
 
   } else {
     # print filtered positions and grep these pos only from pileup file of germline sample
-    cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = F)
-    controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_chr",chrom,".pileup"),full.names = T)
+    cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = FALSE)
+    controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_chr",chrom,".pileup"),full.names = TRUE)
     cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
     system(cmd)
-    ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = F,showProgress = T,header = F,na.strings = "",colClasses = list(character=10))
+    ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = FALSE,showProgress = TRUE,header = FALSE,na.strings = "",colClasses = list(character=10))
     system("rm postogrep.txt filtered.germline.pileup.txt")
     ctrl.pileup = ctrl.pileup[,1:9]
     ctrl.pileup = unique(ctrl.pileup)
@@ -78,7 +78,7 @@ filter = function(i,
   }
 
   # F1) Custom basic filters [ in germline ]
-  common = merge(x = snvs,y = ctrl.pileup,by = c("chr","pos","ref"),all.x = T,suffixes = c("_case","_control"))
+  common = merge(x = snvs,y = ctrl.pileup,by = c("chr","pos","ref"),all.x = TRUE,suffixes = c("_case","_control"))
 
   if(is.na(germline.folder)){
     toremove <- NULL
@@ -87,7 +87,7 @@ filter = function(i,
   }
 
   if(length(toremove)>0){
-    putsnvs <- common[-toremove,,drop=F]
+    putsnvs <- common[-toremove,,drop=FALSE]
   } else {
     putsnvs <- common
   }
@@ -95,8 +95,8 @@ filter = function(i,
   if(nrow(putsnvs) > 0){
     # F2) Filters on Variant Allelic Fraction and add pbem [ in plasma/tumor ]
     # import pbem of this chrom
-    tabpbem_file = list.files(pbem_dir, pattern = paste0('bperr_',chrom,'.tsv'),full.names = T)
-    tabpbem = fread(input = tabpbem_file,stringsAsFactors = F,showProgress = F,header = F,colClasses = list(character=2,character=5),data.table = F)
+    tabpbem_file = list.files(pbem_dir, pattern = paste0('bperr_',chrom,'.tsv'),full.names = TRUE)
+    tabpbem = fread(input = tabpbem_file,stringsAsFactors = FALSE,showProgress = FALSE,header = FALSE,colClasses = list(character=2,character=5),data.table = FALSE)
     colnames(tabpbem) <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available",'n_pos_af_lth','n_pos_af_gth','count.A_af_gth','count.C_af_gth','count.G_af_gth','count.T_af_gth',"bperr","tot_reads_supporting_alt")
     # TABLE 1
     chrpmF1 = apply_AF_filters(chrpmF1=putsnvs,
@@ -107,7 +107,7 @@ filter = function(i,
                                mc.cores=njobs)
     chrpmF1 = chrpmF1[,c("chr","pos","ref","alt","A_case","C_case","G_case","T_case","af_case","cov_case","Ars","Crs","Grs","Trs","rev.ref","fwd.ref","cov.alt","rev.alt","fwd.alt","strandbias","A_control","C_control","G_control","T_control","af_control","cov_control","af_threshold")]
     chrpmF1$group <- paste(chrpmF1$chr,chrpmF1$pos,chrpmF1$ref,sep = ":")
-    cpmf1 = merge(x = chrpmF1,y = tabpbem,by = c("group","chr","pos","ref"),all.x = T)
+    cpmf1 = merge(x = chrpmF1,y = tabpbem,by = c("group","chr","pos","ref"),all.x = TRUE)
     cpmf1 = cpmf1[,c("group","chr","pos","ref","dbsnp","alt","A_case","C_case","G_case","T_case","af_case","cov_case","Ars","Crs","Grs","Trs","rev.ref","fwd.ref","cov.alt","rev.alt","fwd.alt",
                      "strandbias","A_control","C_control","G_control","T_control","af_control","cov_control","af_threshold","tot_coverage","total.A","total.C","total.G","total.T",
                      "n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")]
@@ -121,7 +121,7 @@ filter = function(i,
     # compute pbem allele
     Nids = which(cpmf1$alt=='N')
     if(length(Nids)>0){cpmf1 = cpmf1[-Nids,]}
-    if(!is.na(germline.folder)){cpmf1 = cpmf1[which(!is.na(cpmf1$cov_control)),,drop=F]}
+    if(!is.na(germline.folder)){cpmf1 = cpmf1[which(!is.na(cpmf1$cov_control)),,drop=FALSE]}
 
     if(nrow(cpmf1)==0){
       return()
@@ -141,7 +141,7 @@ filter = function(i,
 
     # TABLE 2
     cpmf1$af_threshold[which(is.na(cpmf1$af_threshold))] <- -1
-    cpmf2 = cpmf1[which(cpmf1$af_case >= cpmf1$af_threshold),,drop=F]
+    cpmf2 = cpmf1[which(cpmf1$af_case >= cpmf1$af_threshold),,drop=FALSE]
     if(nrow(cpmf2)==0){
       return()
     }
@@ -168,9 +168,9 @@ filter = function(i,
     }
 
     # Return chromosome tables
-    write.table(cpmf1,file = 'chrpm_f1.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
-    write.table(cpmf2,file = 'chrpm_f2.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
-    write.table(cpmf3,file = 'chrpm_f3.tsv',sep = '\t',col.names = F,row.names = F,quote = F)
+    write.table(cpmf1,file = 'chrpm_f1.tsv',sep = '\t',col.names = FALSE,row.names = FALSE,quote = FALSE)
+    write.table(cpmf2,file = 'chrpm_f2.tsv',sep = '\t',col.names = FALSE,row.names = FALSE,quote = FALSE)
+    write.table(cpmf3,file = 'chrpm_f3.tsv',sep = '\t',col.names = FALSE,row.names = FALSE,quote = FALSE)
     cat(paste(colnames(cpmf1),collapse='\t'),file = file.path(caseout_folder,out1),sep = '\n')
     cat(paste(colnames(cpmf2),collapse='\t'),file = file.path(caseout_folder,out2),sep = '\n')
     cat(paste(colnames(cpmf3),collapse='\t'),file = file.path(caseout_folder,out3),sep = '\n')

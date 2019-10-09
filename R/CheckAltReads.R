@@ -1,5 +1,5 @@
 CheckAltReads <- function(i,snvs){
-  this = snvs[i,,drop=F]
+  this = snvs[i,,drop=FALSE]
   altbase = this$alt
   refbase = this$ref
   cov.ref = this[,refbase]

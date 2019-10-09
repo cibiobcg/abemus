@@ -1,5 +1,5 @@
 import_sif <- function(main_sif){
-  df  <-  read.delim(main_sif,as.is=T,stringsAsFactors = F,header = F)
+  df  <-  read.delim(main_sif,as.is=TRUE,stringsAsFactors = FALSE,header = FALSE)
   colnames(df) <- c("patient","plasma","plasma.bam","germline","germline.bam")
   # remove NAs and keep only unique germline samples
   df_ctrl <- df[which(!is.na(df$germline.bam)),,drop=FALSE]

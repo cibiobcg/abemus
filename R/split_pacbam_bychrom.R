@@ -9,29 +9,29 @@ split_pacbam_bychrom <- function(targetbed,
                                  mc.cores=1,
                                  pacbamfolder_bychrom){
 
-  pacbamlist = list.files(pacbamfolder,full.names = T,pattern = "\\.pabs$|\\.pileup$")
+  pacbamlist = list.files(pacbamfolder,full.names = TRUE, pattern = "\\.pabs$|\\.pileup$")
   samplelist = unique(gsub(basename(pacbamlist),pattern = '.pabs|.pileup',replacement = ''))
 
-  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  message(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
   CHR <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
   for(sname in samplelist){
     dirname <- sname
-    cat(paste("[",Sys.time(),"]\t",dirname,"\twrite pileup_bychrom...\t"))
+    message(paste("[",Sys.time(),"]\t",dirname,"\twrite pileup_bychrom...\t"))
     dir.create(file.path(pacbamfolder_bychrom,dirname))
     dir.create(file.path(pacbamfolder_bychrom,dirname,"pileup"))
     setwd(file.path(pacbamfolder_bychrom,dirname,"pileup"))
-    pileup_list = grep(pacbamlist,pattern = "\\.pileup$",value = T)
-    pileup_file = grep(pileup_list,pattern = paste(dirname,"pileup",sep="."),value = T)
+    pileup_list = grep(pacbamlist,pattern = "\\.pileup$",value = TRUE)
+    pileup_file = grep(pileup_list,pattern = paste(dirname,"pileup",sep="."),value = TRUE)
     mclapply(seq(1,length(CHR),1),pileup_splitbychr,CHR=CHR,pileup_file=pileup_file,mc.cores=mc.cores)
-    cat("done.\n")
-    cat(paste("[",Sys.time(),"]\t",dirname,"\twrite pabs_bychrom...\t"))
+    message("done.\n")
+    message(paste("[",Sys.time(),"]\t",dirname,"\twrite pabs_bychrom...\t"))
     dir.create(file.path(pacbamfolder_bychrom,dirname,"snvs"))
     setwd(file.path(pacbamfolder_bychrom,dirname,"snvs"))
-    pabs_list = grep(pacbamlist,pattern = "\\.pabs$",value = T)
-    pabs_file = grep(pabs_list,pattern = paste(dirname,"pabs",sep="."),value = T)
+    pabs_list = grep(pacbamlist,pattern = "\\.pabs$",value = TRUE)
+    pabs_file = grep(pabs_list,pattern = paste(dirname,"pabs",sep="."),value = TRUE)
     mclapply(seq(1,length(CHR),1),pabs_splitbychr,CHR=CHR,snvs_file=pabs_file,mc.cores=mc.cores)
-    cat("done.\n")
+    message("done.\n")
   }
 
 }

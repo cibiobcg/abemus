@@ -45,7 +45,7 @@ callsnvs <- function(sample.info.file,
 
   cat(paste("[",Sys.time(),"]\tDetection of somatic SNVs in case samples","\n"))
   if(!file.exists(file.path(outdir, outdir.calls.name))){
-    dir.create(file.path(outdir, outdir.calls.name), showWarnings = T)
+    dir.create(file.path(outdir, outdir.calls.name), showWarnings = TRUE)
   }
 
   # compute minaf_cov_corrected
@@ -66,8 +66,8 @@ callsnvs <- function(sample.info.file,
                     mincovgerm = as.character(mincovgerm),
                     maxafgerm = as.character(maxafgerm),
                     filtering_date = Sys.time(),
-                    stringsAsFactors = F)
-  write.table(fpam,file = file.path(outdir, outdir.calls.name, "filtering_criteria.txt"),col.names = T,row.names = F,sep="\t",quote = F)
+                    stringsAsFactors = FALSE)
+  write.table(fpam,file = file.path(outdir, outdir.calls.name, "filtering_criteria.txt"),col.names = TRUE,row.names = FALSE,sep="\t",quote = FALSE)
 
   # Import background pbem
   load(file.path(pbem_dir, "pbem_background.RData"))
@@ -85,13 +85,13 @@ callsnvs <- function(sample.info.file,
     out3 = paste0("pmtab_F3_",name.plasma,".tsv")
     # create sub-folder to save outputs per each case
     caseout_folder = file.path(outdir, outdir.calls.name, name.plasma)
-    dir.create(caseout_folder,showWarnings = T)
+    dir.create(caseout_folder,showWarnings = TRUE)
 
     if(is.na(name.germline)){
 
       germline.folder <- NA
 
-      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
+      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = TRUE)
       if(length(plasma.folder)==0){
         message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
         stop()
@@ -99,12 +99,12 @@ callsnvs <- function(sample.info.file,
 
     } else {
 
-      germline.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.germline,"$"),full.names = T)
+      germline.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.germline,"$"),full.names = TRUE)
       if(length(germline.folder)==0){
         message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.germline))
         stop()
       }
-      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = T)
+      plasma.folder = list.files(pacbamfolder_bychrom, pattern = paste0(name.plasma,"$"),full.names = TRUE)
       if(length(plasma.folder)==0){
         message("[ ERROR ] Cannot find folder:\t",file.path(pacbamfolder_bychrom, name.plasma))
         stop()
@@ -141,21 +141,21 @@ callsnvs <- function(sample.info.file,
 
     # collapse all chromosome outs into a single table
     setwd(caseout_folder)
-    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f1.tsv')
+    tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f1.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out1)
       system(cmd)
     } else {
       cat(file = "f1_table_WARNING.txt","No calls found in chrpm_f1.tsv")
     }
-    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f2.tsv')
+    tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f2.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out2)
       system(cmd)
     } else {
       cat(file = "f2_table_WARNING.txt","No calls found in chrpm_f2.tsv")
     }
-    tabs_list = list.files(caseout_folder,full.names = T,recursive = T,pattern = 'chrpm_f3.tsv')
+    tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f3.tsv')
     if(length(tabs_list)>0){
       cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out3)
       system(cmd)

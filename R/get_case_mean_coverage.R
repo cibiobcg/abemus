@@ -9,7 +9,7 @@ get_case_mean_coverage <- function(tabindex,
   pacbam_list <- list.files(pacbamfolder_bychrom,full.names = TRUE)
 
   chrom_mean_cov <- function(cp){
-    chrom_cov <- fread(input = cp,sep = "\t",skip = 1,stringsAsFactors = F,select = 9,data.table = FALSE)
+    chrom_cov <- fread(input = cp,sep = "\t",skip = 1,stringsAsFactors = FALSE,select = 9,data.table = FALSE)
     return( mean(as.numeric(chrom_cov[,1])) )
   }
 

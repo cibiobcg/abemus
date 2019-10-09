@@ -7,7 +7,7 @@ fromListToDF <- function(inputList){
   }
   firstEl <- inputList[[1]]
   inputList <- lapply(inputList, function(x){ matrix(unlist(x), ncol=ncol(x))} )
-  outDF <- as.data.frame(do.call(rbind, inputList),stringsAsFactors=F)
+  outDF <- as.data.frame(do.call(rbind, inputList),stringsAsFactors=FALSE)
   colnames(outDF) <-names(firstEl)
 
   for(idx in c(1:ncol(outDF))){

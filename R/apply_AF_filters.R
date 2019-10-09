@@ -11,7 +11,7 @@ apply_AF_filters <- function(chrpmF1,
   } else if (AFbycov == TRUE & !is.numeric(AFbycov)){
     thresholds = as.numeric(af.threshold.table[,-1])
     af_filter_by_coverage <- function(y,thresholds,chrpmF1){
-      this = chrpmF1[y,,drop=F]
+      this = chrpmF1[y,,drop=FALSE]
       minaf_covth = thresholds[findInterval(this$cov_case,mybreaks)]
       this[,'af_threshold'] <- minaf_covth
       return(this)

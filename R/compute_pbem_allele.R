@@ -1,5 +1,5 @@
 compute_pbem_allele <- function(id,abemus){
-  locus = abemus[id,,drop=F]
+  locus = abemus[id,,drop=FALSE]
   locus$pbem_allele = as.numeric(locus[paste0('total.',locus$alt)]/locus$tot_coverage)
   # check if same alt allele is observed in case and germline (when af germline > 0)
   alt_case = as.numeric(locus[paste0(locus$alt,'_case')])
