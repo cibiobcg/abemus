@@ -4,7 +4,7 @@
 \alias{bed2positions}
 \title{From BED format file to a list of loci}
 \usage{
-bed2positions(targetbed, chrom_to_extract, get_only_chromosomes = F)
+bed2positions(targetbed, chrom_to_extract, get_only_chromosomes = FALSE)
 }
 \arguments{
 \item{targetbed}{Genomic regions in the BED tab-delimited format.}
