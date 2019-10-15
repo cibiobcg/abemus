@@ -11,7 +11,11 @@ compute_afthreshold <- function(outdir,
                                 outdir.afth.name = "Controls",
                                 coverage_binning = 50,
                                 probs = seq(0.9,1,0.0001)){
-  cat(paste("[",Sys.time(),"]\tEstimation of AF thresolds exploiting germline samples only","\n"))
+
+  old_wd <- getwd()
+  on.exit(setwd(old_wd))
+
+  message(paste("[",Sys.time(),"]\tEstimation of AF thresolds exploiting germline samples only"))
 
   if(!file.exists(file.path(outdir, outdir.afth.name))){
     dir.create(file.path(outdir, outdir.afth.name), showWarnings = TRUE)
@@ -23,29 +27,29 @@ compute_afthreshold <- function(outdir,
 
   #  check if data tables exists
   if(file.exists(vafcov_file)){
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"))
     #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
     vafcov = fread(input = vafcov_file,sep = "\t",header = FALSE,stringsAsFactors = FALSE,data.table = FALSE)
   } else {
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"))
     stop()
   }
 
   if(file.exists(afz_file)){
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ ok ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ ok ]"))
     load(afz_file)
   } else {
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"))
     stop()
   }
 
-  cat(paste("[",Sys.time() ,"]\taf.all",dim(vafcov)[1] + sum(afz),"af.gtz",dim(vafcov)[1],"af.etz",sum(afz)),"\n")
-  cat(paste("[",Sys.time(),"]\tcompute AF quantiles +++ not stratified by coverage +++"),"\n")
+  message(paste("[",Sys.time() ,"]\taf.all",dim(vafcov)[1] + sum(afz),"af.gtz",dim(vafcov)[1],"af.etz",sum(afz)))
+  message(paste("[",Sys.time(),"]\tcompute AF quantiles +++ not stratified by coverage +++"))
   nz <-  sum(afz)
   th_results <-  quantile.zaf(x = as.numeric(vafcov[,1]),probs = probs,nz = nz)
   #minaf <- as.numeric(th_results[as.character(spec)])
 
-  cat(paste("[",Sys.time(),"]\tcompute AF quantiles +++ stratified by coverage +++"),"\n")
+  message(paste("[",Sys.time(),"]\tcompute AF quantiles +++ stratified by coverage +++"))
 
   covbin <- define_cov_bins(coverage_binning)[[1]]
   lev <- define_cov_bins(coverage_binning)[[2]]
@@ -54,7 +58,7 @@ compute_afthreshold <- function(outdir,
   th_results_bin = data.frame(specificity = probs)
   datacount_bin = array(data = 0,dim = length(lev),dimnames = list(lev))
   for(l in lev){
-    cat(paste("[",Sys.time(),"]\tprocessing coverage bin\t",l),"\n")
+    message(paste("[",Sys.time(),"]\tprocessing coverage bin\t",l))
     idx = which(a==l)
     datacount_bin[l] <- length(idx)
     if(length(idx)>0){
@@ -68,11 +72,11 @@ compute_afthreshold <- function(outdir,
   }
   #minaf_cov = th_results_bin[which(round(th_results_bin$specificity,4)==spec),]
 
-  cat(paste("[",Sys.time(),"]\tSaving threshold data\n"))
+  message(paste("[",Sys.time(),"]\tSaving threshold data"))
   #save(minaf,minaf_cov,th_results,th_results_bin,covbin,lev,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
   save(th_results,th_results_bin,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = TRUE)
 
-  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  message(paste("[",Sys.time(),"]\talright."))
   return(list(th_results=th_results,
               th_results_bin=th_results_bin,
               datacount_bin=datacount_bin))

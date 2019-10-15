@@ -18,29 +18,29 @@ adjust_af_threshold_table <- function(controls_dir,
 
   dthdataFile <- file.path(controls_dir,"datathreshold.RData")
   if(file.exists(dthdataFile)){
-    cat(paste("[",Sys.time(),"]\tlooking for",dthdataFile,"[ ok ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for",dthdataFile,"[ ok ]"))
     load(file = dthdataFile)
   } else {
-    cat(paste("[",Sys.time(),"]\tlooking for",dthdataFile,"[ not found ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for",dthdataFile,"[ not found ]"))
     stop()
   }
 
   vafcov_file = file.path(pbem_dir,"afgtz.tsv")
   if(file.exists(vafcov_file)){
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"))
     #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
     vafcov = fread(input = vafcov_file,sep = "\t",header = FALSE,stringsAsFactors = FALSE,data.table = FALSE)
   } else {
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"))
     stop()
   }
 
   afz_file = file.path(pbem_dir,"afz.RData")
   if(file.exists(afz_file)){
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ ok ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ ok ]"))
     load(afz_file)
   } else {
-    cat(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"),"\n")
+    message(paste("[",Sys.time(),"]\tlooking for data.table with AFs = 0 and coverages:",afz_file,"[ not found ]"))
     stop()
   }
 
@@ -62,7 +62,7 @@ adjust_af_threshold_table <- function(controls_dir,
   for(i in 1:stop){
     current.bin = names(datacount_bin_complete)[i]
     current.bin.card = as.numeric(datacount_bin_complete[i])
-    cat(paste("[",Sys.time(),"]\tevaluating bin:",current.bin),"\n")
+    message(paste("[",Sys.time(),"]\tevaluating bin:",current.bin))
     if(current.bin.card >= last.stable.card){
       for(j in (i+1):(stop+1)){
         next.bin = names(datacount_bin_complete)[j]
@@ -97,7 +97,7 @@ adjust_af_threshold_table <- function(controls_dir,
   save(tab,file = file.path(controls_dir, name.out),compress = TRUE)
 
   # correct the original threhsold table
-  cat(paste("[",Sys.time(),"]\tcorrecting original afth table"),"\n")
+  message(paste("[",Sys.time(),"]\tcorrecting original afth table"))
   minaf_cov_corrected <- th_results_bin[which(round(th_results_bin$specificity,4) == as.numeric(detection.specificity)),]
   C = tab$last.stable.card[nrow(tab)]
 
@@ -130,11 +130,11 @@ adjust_af_threshold_table <- function(controls_dir,
   N = length(minaf_cov_corrected)
   minaf_cov_corrected[N] <- minaf_cov_corrected[N-1]
 
-  cat(paste("[",Sys.time(),"]\tsaving corrected table"),"\n")
+  message(paste("[",Sys.time(),"]\tsaving corrected table"))
   name.out = paste0("minaf_cov_corrected_",replicas,"r_",detection.specificity,"_b.RData") # _b annotation, to be removed
   save(minaf_cov_corrected,file = file.path(controls_dir,name.out))
 
-  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  message(paste("[",Sys.time(),"]\talright."))
   return(list(info.tab=tab,
               minaf_cov_corrected=minaf_cov_corrected))
 }

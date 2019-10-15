@@ -37,13 +37,16 @@ callsnvs <- function(sample.info.file,
                      outdir.calls.name = "Results",
                      chrom.in.parallel = 1){
 
-  cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
+  old_wd <- getwd()
+  on.exit(setwd(old_wd))
+
+  message(paste("[",Sys.time(),"]\tReading the sample.info.file"))
   sif <- import_sif(main_sif = sample.info.file)
 
-  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  message(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'"))
   chromosomes <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
-  cat(paste("[",Sys.time(),"]\tDetection of somatic SNVs in case samples","\n"))
+  message(paste("[",Sys.time(),"]\tDetection of somatic SNVs in case samples"))
   if(!file.exists(file.path(outdir, outdir.calls.name))){
     dir.create(file.path(outdir, outdir.calls.name), showWarnings = TRUE)
   }
@@ -79,7 +82,7 @@ callsnvs <- function(sample.info.file,
     name.patient = TableSif$patient[id]
     name.plasma = gsub(basename(this$plasma.bam),pattern = ".bam",replacement = "")
     name.germline = gsub(basename(this$germline.bam),pattern = ".bam",replacement = "")
-    cat(paste("[",Sys.time(),"]\tPatient:",name.patient,"\tCase:",name.plasma,"\tControl:",name.germline),"\n")
+    message(paste("[",Sys.time(),"]\tPatient:",name.patient,"\tCase:",name.plasma,"\tControl:",name.germline))
     out1 = paste0("pmtab_F1_",name.plasma,".tsv")
     out2 = paste0("pmtab_F2_",name.plasma,".tsv")
     out3 = paste0("pmtab_F3_",name.plasma,".tsv")
@@ -169,6 +172,6 @@ callsnvs <- function(sample.info.file,
                                      outdir = outdir,
                                      outdir.calls.name = outdir.calls.name)
 
-  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  message(paste("[",Sys.time(),"]\talright."))
   return(list(tabsnvs_index=tabsnvs_index))
 }
