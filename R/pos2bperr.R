@@ -38,7 +38,7 @@ pos2bperr = function(id,
   cmd = paste0("awk -F'\t' '{if (FILENAME == \"",outfile,"\") { t[$1] = 1; } else { if (t[$2]) { print }}}' ",outfile," ",germlineset," > ",filtpileup)
   system(cmd)
   if(file.info(filtpileup)$size == 0){
-    cat(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."),"\n")
+    message(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."))
   } else {
     completetab_all = read.delim(filtpileup,stringsAsFactors = FALSE,header = FALSE,sep = "\t",na.strings = "")
     names(completetab_all) <- c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD","dbsnp")
@@ -84,7 +84,7 @@ pos2bperr = function(id,
       tabstats <- do.call("rbind", lapply(seq(1,nrow(this_ans),1),get_pbem,tgf=this_ans))
       #tabstats <- tabstats[with(tabstats, order(pos)), ]
 
-      cat(paste("[",Sys.time(),"]\twriting output for positions in: ",filtpileup),"\n")
+      message(paste("[",Sys.time(),"]\twriting output for positions in: ",filtpileup))
       write.table(tabstats,file = taboutchrom,append = FALSE,quote = FALSE,row.names = FALSE,col.names = FALSE,sep="\t")
     }
   }
