@@ -14,11 +14,11 @@ apply_scaling_factor <- function(tabindex,
 
     #<check>
     if(!"case_mean_coverage"%in%colnames(tabindex)){
-      cat(paste("[",Sys.time(),"]\tError. column 'case_mean_coverage' must be present in tabindex when use.optimal.R = TRUE","\n"))
+      message(paste("[",Sys.time(),"]\tError. column 'case_mean_coverage' must be present in tabindex when use.optimal.R = TRUE"))
       stop()
     }
     if(is.na(target_size)){
-      cat(paste("[",Sys.time(),"]\tError. 'target_size' needed when use.optimal.R = TRUE","\n"))
+      message(paste("[",Sys.time(),"]\tError. 'target_size' needed when use.optimal.R = TRUE"))
       stop()
     }
 
@@ -49,7 +49,7 @@ apply_scaling_factor <- function(tabindex,
       tabindex[i,paste0("tabcalls_f3","_optimalR")] <- out.path
       tabindex[i,paste0("tabcalls_f3","_optimalR_used")] <- optR
     }
-    cat(paste("[",Sys.time(),"]\talright.","\n"))
+    message(paste("[",Sys.time(),"]\talright."))
     return(tabindex)
 
   } else {
@@ -66,7 +66,7 @@ apply_scaling_factor <- function(tabindex,
       write.table(x = a,file = out.path,quote = FALSE,sep = "\t",row.names = FALSE,col.names = TRUE)
       tabindex[i,paste0("tabcalls_f3","_R",R)] <- out.path
     }
-    cat(paste("[",Sys.time(),"]\talright.","\n"))
+    message(paste("[",Sys.time(),"]\talright."))
     return(tabindex)
 
   }
