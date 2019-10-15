@@ -27,13 +27,17 @@ compute_pbem <- function(sample.info.file,
                          n_pos_af_th = 0.2,
                          mc.cores = 1,
                          step = 5000){
-  cat(paste("[",Sys.time(),"]\tReading the sample.info.file","\n"))
+
+  old_wd <- getwd()
+  on.exit(setwd(old_wd))
+
+  message(paste("[",Sys.time(),"]\tReading the sample.info.file"))
   sif <- import_sif(main_sif = sample.info.file)
 
-  cat(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'","\n"))
+  message(paste("[",Sys.time(),"]\tReading chromosomes from 'targetbed'"))
   chromosomes <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)[[1]]
 
-  cat(paste("[",Sys.time(),"]\tComputation of per-base error model","\n"))
+  message(paste("[",Sys.time(),"]\tComputation of per-base error model"))
 
   if(!file.exists(file.path(outdir, outdir.bperr.name))){
     dir.create(file.path(outdir, outdir.bperr.name), showWarnings = TRUE)
@@ -41,12 +45,12 @@ compute_pbem <- function(sample.info.file,
   setwd(file.path(outdir, outdir.bperr.name))
 
   for(chrom in unique(chromosomes)){
-    cat(paste("[",Sys.time(),"]\tchromosome:",chrom),"\n")
+    message(paste("[",Sys.time(),"]\tchromosome:",chrom))
 
     tp <- bed2positions(targetbed = targetbed,chrom_to_extract = chrom,get_only_chromosomes = FALSE)
     targets <- unique(tp$PosByChrom)
 
-    cat(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)),"\n")
+    message(paste("[",Sys.time(),"]\ttotal positions to check in this chromosome :",nrow(targets)))
     mclapply(seq(1,nrow(targets),step),pos2bperr,
              targets=targets,
              germlineset=get_germlineset(sifgerm = sif$df_ctrl,pacbamfolder_bychrom = pacbamfolder_bychrom,chrom = chrom),
@@ -102,7 +106,7 @@ compute_pbem <- function(sample.info.file,
 
   save(pbem_tab,file = file.path(outdir, outdir.bperr.name,"pbem_tab.RData"),compress = TRUE)
 
-  cat(paste("[",Sys.time(),"]\talright.","\n"))
+  message(paste("[",Sys.time(),"]\talright."))
   return(list(pbem_tab=pbem_tab,
               bperr_summary=bperr_summary,
               bgpbem=bgpbem,
