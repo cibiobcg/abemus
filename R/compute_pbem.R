@@ -13,6 +13,12 @@
 #' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
 #' @param mc.cores mc.core param from mclapply. default: 1
 #' @param step into how many positions to split the chrom file. default: 5000
+#' @examples
+#' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
+#' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+#' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
+#' outdir <- tempdir()
+#' outpbem <- compute_pbem(sample.info.file = sample.info.file,targetbed = targetbed,outdir=outdir,pacbamfolder_bychrom=pacbamfolder_bychrom)
 #' @return list(bperr, bperr_summary, bperr_tabstat)
 compute_pbem <- function(sample.info.file,
                          targetbed,

@@ -44,3 +44,10 @@ list(bperr, bperr_summary, bperr_tabstat)
 \description{
 Compute per-base error model on each targeted position and save AFs by bins of coverage
 }
+\examples{
+sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
+targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
+outdir <- tempdir()
+outpbem <- compute_pbem(sample.info.file = sample.info.file,targetbed = targetbed,outdir=outdir,pacbamfolder_bychrom=pacbamfolder_bychrom)
+}

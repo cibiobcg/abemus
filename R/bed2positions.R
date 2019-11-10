@@ -4,6 +4,10 @@
 #' @param chrom_to_extract the chromosome name to extract as i.e. "chr1" or "1" accordingly with BED file annotation
 #' @return PosByChrom A list of data.frames, each for each chromosome.
 #' @return chromosomes The chromosomes included in the BED file.
+#' @examples
+#' targetbed <- system.file("extdata", "regions_toy.bed",package = "abemus")
+#' chromosomes <- bed2positions(targetbed = targetbed,chrom_to_extract="8")
+#' targetbp_list <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)
 #' @export
 bed2positions <- function(targetbed,
                           chrom_to_extract,

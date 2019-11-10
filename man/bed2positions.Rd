@@ -21,3 +21,8 @@ chromosomes The chromosomes included in the BED file.
 \description{
 From BED format file to a list of loci
 }
+\examples{
+targetbed <- system.file("extdata", "regions_toy.bed",package = "abemus")
+chromosomes <- bed2positions(targetbed = targetbed,chrom_to_extract="8")
+targetbp_list <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)
+}
