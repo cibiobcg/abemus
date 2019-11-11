@@ -5,6 +5,18 @@
 #' @param R scaling factor to be applied at filter.pbem_coverage value. default = 1
 #' @param use.optimal.R Automatically use the best R given mean coverage of the case sample and size of targeted regions. default: FALSE
 #' @param target_size (if use.optimal.R = TRUE) target size in Mb of the BED file. Use get_target_size()
+#' @examples
+#' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
+#' outdir <- tempdir()
+#' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+#' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
+#' pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
+#' controls_dir <- system.file("extdata", "Controls", package = "abemus")
+#' calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
+#' tabindex <- calls$tabsnvs_index
+#' tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
+#' calls$tabsnvs_index_scalfact <- apply_scaling_factor(tabindex = tabindex)
+#' @return The most suitable scaling factor R to be appliced to call SNVs
 apply_scaling_factor <- function(tabindex,
                                  R = 1,
                                  use.optimal.R = FALSE,

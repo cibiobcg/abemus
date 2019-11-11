@@ -17,3 +17,14 @@ sample.info.file with 1 additional column reporting the mean coverage for each c
 \description{
 Compute the mean coverage of a case sample
 }
+\examples{
+sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
+outdir <- tempdir()
+targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
+pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
+controls_dir <- system.file("extdata", "Controls", package = "abemus")
+calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
+tabindex <- calls$tabsnvs_index
+tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
+}

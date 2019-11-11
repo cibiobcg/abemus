@@ -5,6 +5,10 @@
 #' @param outdir.afth.name folder will be created in outdir. default: "Controls"
 #' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
 #' @param probs quatiles to compute
+#' @examples
+#' outdir <- tempdir()
+#' pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
+#' outafth <- compute_afthreshold(outdir = outdir,pbem_dir = pbem_dir)
 #' @return allelic fraction thresholds
 compute_afthreshold <- function(outdir,
                                 pbem_dir = file.path(outdir,"BaseErrorModel"),
@@ -28,7 +32,6 @@ compute_afthreshold <- function(outdir,
   #  check if data tables exists
   if(file.exists(vafcov_file)){
     message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ ok ]"))
-    #vafcov = read.big.matrix(filename = vafcov_file,header = F,sep = "\t",type = "double")
     vafcov = fread(input = vafcov_file,sep = "\t",header = FALSE,stringsAsFactors = FALSE,data.table = FALSE)
   } else {
     message(paste("[",Sys.time(),"]\tlooking for data.table with AFs > 0 and coverages:",vafcov_file,"[ not found ]"))
@@ -47,7 +50,6 @@ compute_afthreshold <- function(outdir,
   message(paste("[",Sys.time(),"]\tcompute AF quantiles +++ not stratified by coverage +++"))
   nz <-  sum(afz)
   th_results <-  quantile.zaf(x = as.numeric(vafcov[,1]),probs = probs,nz = nz)
-  #minaf <- as.numeric(th_results[as.character(spec)])
 
   message(paste("[",Sys.time(),"]\tcompute AF quantiles +++ stratified by coverage +++"))
 
@@ -70,10 +72,8 @@ compute_afthreshold <- function(outdir,
       th_results_bin[,l] <- NA
     }
   }
-  #minaf_cov = th_results_bin[which(round(th_results_bin$specificity,4)==spec),]
 
   message(paste("[",Sys.time(),"]\tSaving threshold data"))
-  #save(minaf,minaf_cov,th_results,th_results_bin,covbin,lev,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = T)
   save(th_results,th_results_bin,datacount_bin,file = file.path(outdir, outdir.afth.name,paste0("datathreshold.RData")),compress = TRUE)
 
   message(paste("[",Sys.time(),"]\talright."))

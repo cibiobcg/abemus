@@ -25,3 +25,8 @@ allelic fraction thresholds
 \description{
 Compute Allelic Fraction thresholds
 }
+\examples{
+outdir <- tempdir()
+pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
+outafth <- compute_afthreshold(outdir = outdir,pbem_dir = pbem_dir)
+}

@@ -22,5 +22,6 @@ Split PaCBAM ouputs by chromosomes
 \examples{
 targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
 pacbamfolder <- system.file("extdata", "pacbam_data", package = "abemus")
-split_pacbam_bychrom(targetbed=targetbed,pacbamfolder=pacbamfolder,pacbamfolder_bychrom=tempdir())
+pacbamfolder_bychrom <- tempdir()
+split_pacbam_bychrom(targetbed=targetbed,pacbamfolder=pacbamfolder,pacbamfolder_bychrom=pacbamfolder_bychrom)
 }

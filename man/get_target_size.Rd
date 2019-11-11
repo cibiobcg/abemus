@@ -17,3 +17,7 @@ Mbp covered in the BED file
 \description{
 Compute total number of loci covered in a BED file
 }
+\examples{
+targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+target_size <- get_target_size(targetbed=targetbed, Mbp = TRUE)
+}

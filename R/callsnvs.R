@@ -17,6 +17,15 @@
 #' @param outdir output folder for this step analysis
 #' @param outdir.calls.name folder will be created in outdir. default: "Results"
 #' @param chrom.in.parallel number of chromosomes to run in parallel. default: 1
+#' @examples
+#' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
+#' outdir <- tempdir()
+#' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
+#' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
+#' pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
+#' controls_dir <- system.file("extdata", "Controls", package = "abemus")
+#' calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
+#' @return list of data frames with path to files with SNV calls.
 #' @export
 callsnvs <- function(sample.info.file,
                      targetbed,
