@@ -67,10 +67,18 @@ filter = function(i,
     # print filtered positions and grep these pos only from pileup file of germline sample
     cat(unique(snvs$pos),sep = "\n",file = file.path(chromdir,"postogrep.txt"),append = FALSE)
     controlfolder_pileup <- list.files(file.path(germline.folder,"pileup"),pattern = paste0("_chr",chrom,".pileup"),full.names = TRUE)
-    cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
-    system(cmd)
+
+    # [ need improvement ]
+    keep <- unique(snvs$pos)
+    m <- lapply(controlfolder_pileup,fread, sep = "\t", skip = 1, data.table = FALSE)
+    for(x in seq(m)){
+      df <- m[[x]]
+      m[[x]] <- df[which(df[,2] %in% keep),,drop=FALSE]
+    }
+    filtout <- do.call(rbind,m)
+    write.table(filtout,file = "filtered.germline.pileup.txt",quote = FALSE,col.names = FALSE,row.names = FALSE,sep = "\t",na = "")
+
     ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = FALSE,showProgress = TRUE,header = FALSE,na.strings = "",colClasses = list(character=10))
-    #system("rm postogrep.txt filtered.germline.pileup.txt")
     file.remove("postogrep.txt")
     file.remove("filtered.germline.pileup.txt")
     ctrl.pileup = ctrl.pileup[,1:9]

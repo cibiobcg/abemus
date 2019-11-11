@@ -46,9 +46,6 @@ pos2bperr = function(id,
   filtout <- do.call(rbind,m)
   write.table(filtout,file = filtpileup,quote = FALSE,col.names = FALSE,row.names = FALSE,sep = "\t",na = "")
 
-  #cmd = paste0("awk -F'\t' '{if (FILENAME == \"",outfile,"\") { t[$1] = 1; } else { if (t[$2]) { print }}}' ",outfile," ",germlineset," > ",filtpileup)
-  #system(cmd)
-
   if(file.info(filtpileup)$size == 0){
     message(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."))
   } else {
