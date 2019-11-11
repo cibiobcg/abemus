@@ -73,13 +73,22 @@ compute_pbem <- function(sample.info.file,
 
     cmda = paste("cat *_pbem.table.txt >",paste0("bperr_",chrom,".tsv"))
     system(cmda)
-    system("rm *_pbem.table.txt")
+
+    remove.files <- list.files(path = outdir,pattern = "_pbem.table.txt",full.names = TRUE)
+    do.call(file.remove,list(remove.files))
+
     cmdb = paste("cat *_afgtz.table.txt >",paste0("afgtz_",chrom,".tsv"))
     system(cmdb)
-    system("rm *_afgtz.table.txt")
+
+    remove.files <- list.files(path = outdir,pattern = "_afgtz.table.txt",full.names = TRUE)
+    do.call(file.remove,list(remove.files))
+
     cmdc = paste("cat *_afz.table.txt >",paste0("afz_",chrom,".tsv"))
     system(cmdc)
-    system("rm *_afz.table.txt")
+
+    remove.files <- list.files(path = outdir,pattern = "_afz.table.txt",full.names = TRUE)
+    do.call(file.remove,list(remove.files))
+
   }
   cmd.merge = paste("cat afgtz_*.tsv > afgtz.tsv")
   system(cmd.merge)

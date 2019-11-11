@@ -70,7 +70,9 @@ filter = function(i,
     cmd = paste("awk -F'\t' '{if (FILENAME == \"postogrep.txt\") { t[$1] = 1; } else { if (t[$2]) { print }}}' postogrep.txt",controlfolder_pileup,"> filtered.germline.pileup.txt")
     system(cmd)
     ctrl.pileup = fread("filtered.germline.pileup.txt",stringsAsFactors = FALSE,showProgress = TRUE,header = FALSE,na.strings = "",colClasses = list(character=10))
-    system("rm postogrep.txt filtered.germline.pileup.txt")
+    #system("rm postogrep.txt filtered.germline.pileup.txt")
+    file.remove("postogrep.txt")
+    file.remove("filtered.germline.pileup.txt")
     ctrl.pileup = ctrl.pileup[,1:9]
     ctrl.pileup = unique(ctrl.pileup)
     ctrl.pileup = data.frame(ctrl.pileup)
