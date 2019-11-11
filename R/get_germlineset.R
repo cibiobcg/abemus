@@ -7,6 +7,7 @@ get_germlineset <- function(sifgerm,pacbamfolder_bychrom,chrom){
     thisPileup.file = list.files(file.path(pacbamfolder_bychrom,name,"pileup"),full.names = TRUE,pattern = paste0("_chr",chrom,"\\.pileup$"))
     germlineset = c(germlineset,thisPileup.file)
   }
-  germlineset = paste(unique(germlineset),collapse = " ")
+  #germlineset = paste(unique(germlineset),collapse = " ")
+  germlineset <- unique(germlineset)
   return(germlineset)
 }

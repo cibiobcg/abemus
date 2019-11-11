@@ -33,7 +33,6 @@ split_pacbam_bychrom <- function(targetbed,
     m <- fread(file = pileup_file,header = TRUE,stringsAsFactors = FALSE,data.table = FALSE,showProgress = FALSE)
     out <- split(m, f = m[,1] )
     sapply(names(out),function (x) write.table(out[[x]],file=gsub(basename(pileup_file),pattern = ".pileup",replacement = paste0("_chr",gsub(x,pattern = "chr",replacement = ""),".pileup")),quote=FALSE,col.names=TRUE,row.names = FALSE,sep = "\t"))
-    message(paste("[",Sys.time(),"]\t",dirname,"done."))
 
     message(paste("[",Sys.time(),"]\t",dirname,"writing pabs_bychrom"))
     dir.create(file.path(pacbamfolder_bychrom,dirname,"snvs"))
@@ -43,6 +42,5 @@ split_pacbam_bychrom <- function(targetbed,
     m <- fread(file = pabs_file,header = TRUE,stringsAsFactors = FALSE,data.table = FALSE,showProgress = FALSE)
     out <- split(m, f = m[,1] )
     sapply(names(out),function (x) write.table(out[[x]],file=gsub(basename(pabs_file),pattern = ".pabs",replacement = paste0("_chr",gsub(x,pattern = "chr",replacement = ""),".pabs")),quote=FALSE,col.names=TRUE,row.names = FALSE,sep = "\t"))
-    message(paste("[",Sys.time(),"]\t",dirname,"done."))
   }
 }

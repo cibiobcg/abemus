@@ -35,8 +35,20 @@ pos2bperr = function(id,
   afzchrom = paste(this$chr[1],this$pos[1],this$pos[nrow(this)],"afz.table.txt",sep="_")
   afz = array(data = 0,dim = length(lev),dimnames = list(lev))
   cat(unique(this$pos),sep = "\n",file = outfile,append = FALSE)
-  cmd = paste0("awk -F'\t' '{if (FILENAME == \"",outfile,"\") { t[$1] = 1; } else { if (t[$2]) { print }}}' ",outfile," ",germlineset," > ",filtpileup)
-  system(cmd)
+
+  # [ need improvement ]
+  keep <- unique(this$pos)
+  m <- lapply(germlineset,fread, sep = "\t", skip = 1, data.table = FALSE)
+  for(x in seq(m)){
+    df <- m[[x]]
+    m[[x]] <- df[which(df[,2] %in% keep),,drop=FALSE]
+  }
+  filtout <- do.call(rbind,m)
+  write.table(filtout,file = filtpileup,quote = FALSE,col.names = FALSE,row.names = FALSE,sep = "\t",na = "")
+
+  #cmd = paste0("awk -F'\t' '{if (FILENAME == \"",outfile,"\") { t[$1] = 1; } else { if (t[$2]) { print }}}' ",outfile," ",germlineset," > ",filtpileup)
+  #system(cmd)
+
   if(file.info(filtpileup)$size == 0){
     message(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."))
   } else {
