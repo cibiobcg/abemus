@@ -71,29 +71,41 @@ compute_pbem <- function(sample.info.file,
              n_pos_af_th=n_pos_af_th,
              mc.cores=mc.cores)
 
-    cmda = paste("cat *_pbem.table.txt >",paste0("bperr_",chrom,".tsv"))
-    system(cmda)
+    # pbem.table
+    merge.files <- list.files(path = ".",pattern = "_pbem.table.txt",full.names = TRUE)
+    mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+    sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=paste0("bperr_",chrom,".tsv"),append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
 
     remove.files <- list.files(path = ".",pattern = "_pbem.table.txt",full.names = TRUE)
     do.call(file.remove,list(remove.files))
 
-    cmdb = paste("cat *_afgtz.table.txt >",paste0("afgtz_",chrom,".tsv"))
-    system(cmdb)
+    # afgtz.table
+    merge.files <- list.files(path = ".",pattern = "_afgtz.table.txt",full.names = TRUE)
+    mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+    sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=paste0("afgtz_",chrom,".tsv"),append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
 
     remove.files <- list.files(path = ".",pattern = "_afgtz.table.txt",full.names = TRUE)
     do.call(file.remove,list(remove.files))
 
-    cmdc = paste("cat *_afz.table.txt >",paste0("afz_",chrom,".tsv"))
-    system(cmdc)
+    # afz.table
+    merge.files <- list.files(path = ".",pattern = "_afz.table.txt",full.names = TRUE)
+    mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+    sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=paste0("afz_",chrom,".tsv"),append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
 
     remove.files <- list.files(path = ".",pattern = "_afz.table.txt",full.names = TRUE)
     do.call(file.remove,list(remove.files))
 
   }
-  cmd.merge = paste("cat afgtz_*.tsv > afgtz.tsv")
-  system(cmd.merge)
-  cmd.merge = paste("cat afz_*.tsv > afz.tsv")
-  system(cmd.merge)
+
+  # create afgtz.tsv
+  merge.files <- list.files(path = ".",pattern = "afgtz_",full.names = TRUE)
+  mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+  sapply(length(mrgd),function (x) write.table(mrgd[[x]],file="afgtz.tsv",append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
+
+  # create afz.tsv
+  merge.files <- list.files(path = ".",pattern = "afz_",full.names = TRUE)
+  mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+  sapply(length(mrgd),function (x) write.table(mrgd[[x]],file="afz.tsv",append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
 
   # save counter of afz as RData
   afztab = read.delim(file = "afz.tsv",sep="\t",as.is = TRUE,header=FALSE)
@@ -102,8 +114,10 @@ compute_pbem <- function(sample.info.file,
   save(afz,file = "afz.RData",compress = T)
 
   # overall statistics on pbems
-  cmd.merge = paste("cat bperr_*.tsv > bperr.tsv")
-  system(cmd.merge)
+  merge.files <- list.files(path = ".",pattern = "bperr_",full.names = TRUE)
+  mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+  sapply(length(mrgd),function (x) write.table(mrgd[[x]],file="bperr.tsv",append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
+
   pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = FALSE,showProgress = FALSE,header = FALSE,colClasses = list(character=2,character=5),data.table = FALSE)
   header_pbem_tab <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")
   colnames( pbem_tab ) <- header_pbem_tab
