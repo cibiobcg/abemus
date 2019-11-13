@@ -30,7 +30,7 @@ filter = function(i,
   setwd(chromdir)
   # import files
   plasma_snvs = list.files(file.path(plasma.folder,"snvs"),pattern = paste0("_chr",chrom,".pabs"),full.names = TRUE)
-  n.rows.plasma_snvs = as.numeric(unlist(strsplit(trimws(x = system(paste("wc -l",plasma_snvs),intern = TRUE),which = "left"),split = " "))[[1]])
+  n.rows.plasma_snvs <- nrow(fread(plasma_snvs,header = FALSE,sep = "\t",nrows = 5,data.table = FALSE))
   if(n.rows.plasma_snvs == 1){
     return()
   }
