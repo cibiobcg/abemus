@@ -155,22 +155,22 @@ callsnvs <- function(sample.info.file,
     setwd(caseout_folder)
     tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f1.tsv')
     if(length(tabs_list)>0){
-      cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out1)
-      system(cmd)
+      mrgd <- lapply(tabs_list,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+      sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=out1,append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
     } else {
       cat(file = "f1_table_WARNING.txt","No calls found in chrpm_f1.tsv")
     }
     tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f2.tsv')
     if(length(tabs_list)>0){
-      cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out2)
-      system(cmd)
+      mrgd <- lapply(tabs_list,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+      sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=out2,append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
     } else {
       cat(file = "f2_table_WARNING.txt","No calls found in chrpm_f2.tsv")
     }
     tabs_list = list.files(caseout_folder,full.names = TRUE,recursive = TRUE,pattern = 'chrpm_f3.tsv')
     if(length(tabs_list)>0){
-      cmd = paste('cat',paste(tabs_list,collapse = ' '),'>>',out3)
-      system(cmd)
+      mrgd <- lapply(tabs_list,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
+      sapply(length(mrgd),function (x) write.table(mrgd[[x]],file=out3,append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
     } else {
       cat(file = "f3_table_WARNING.txt","No calls found in chrpm_f3.tsv")
     }
