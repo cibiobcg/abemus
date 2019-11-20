@@ -24,14 +24,15 @@
 #' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
 #' pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
 #' controls_dir <- system.file("extdata", "Controls", package = "abemus")
-#' calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
+#' callsnvs(sample.info.file,outdir,targetbed,pbem_dir,controls_dir,pacbamfolder_bychrom,replicas=1)
 #' @return list of data frames with path to files with SNV calls.
 #' @export
 callsnvs <- function(sample.info.file,
+                     outdir,
                      targetbed,
-                     pacbamfolder_bychrom,
                      pbem_dir = file.path(outdir,"BaseErrorModel"),
                      controls_dir = file.path(outdir,"Controls"),
+                     pacbamfolder_bychrom,
                      detection.specificity = 0.995,
                      replicas = 1000,
                      replicas.in.parallel = 1,
@@ -42,7 +43,6 @@ callsnvs <- function(sample.info.file,
                      minalt = 1,
                      maxafgerm = 0.2,
                      coverage_binning = 50,
-                     outdir,
                      outdir.calls.name = "Results",
                      chrom.in.parallel = 1){
 

@@ -4,25 +4,27 @@
 \alias{callsnvs}
 \title{Call somatic SNVs by using both global and local error models}
 \usage{
-callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
+callsnvs(sample.info.file, outdir, targetbed,
   pbem_dir = file.path(outdir, "BaseErrorModel"),
-  controls_dir = file.path(outdir, "Controls"),
+  controls_dir = file.path(outdir, "Controls"), pacbamfolder_bychrom,
   detection.specificity = 0.995, replicas = 1000,
   replicas.in.parallel = 1, coeffvar.threshold = 0.01,
   AFbycov = TRUE, mincov = 10, mincovgerm = 10, minalt = 1,
-  maxafgerm = 0.2, coverage_binning = 50, outdir,
+  maxafgerm = 0.2, coverage_binning = 50,
   outdir.calls.name = "Results", chrom.in.parallel = 1)
 }
 \arguments{
 \item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
 
-\item{targetbed}{targeted regions in BED format.}
+\item{outdir}{output folder for this step analysis}
 
-\item{pacbamfolder_bychrom}{folder with pileups}
+\item{targetbed}{targeted regions in BED format.}
 
 \item{pbem_dir}{folder with pbem data. default: file.path(outdir, "BaseErrorModel")}
 
 \item{controls_dir}{folder with afth data. default: file.path(outdir,"Controls")}
+
+\item{pacbamfolder_bychrom}{folder with pileups}
 
 \item{detection.specificity}{The quantile of the GSE distribution(s) to use to compute the afth. default: 0.995}
 
@@ -44,8 +46,6 @@ callsnvs(sample.info.file, targetbed, pacbamfolder_bychrom,
 
 \item{coverage_binning}{Bins of coverage into which divide allelic fractions. default: 50}
 
-\item{outdir}{output folder for this step analysis}
-
 \item{outdir.calls.name}{folder will be created in outdir. default: "Results"}
 
 \item{chrom.in.parallel}{number of chromosomes to run in parallel. default: 1}
@@ -63,5 +63,5 @@ targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
 pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
 pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
 controls_dir <- system.file("extdata", "Controls", package = "abemus")
-calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
+callsnvs(sample.info.file,outdir,targetbed,pbem_dir,controls_dir,pacbamfolder_bychrom,replicas=1)
 }
