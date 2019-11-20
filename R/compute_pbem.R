@@ -18,7 +18,7 @@
 #' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
 #' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
 #' outdir <- tempdir()
-#' outpbem <- compute_pbem(sample.info.file = sample.info.file,targetbed = targetbed,outdir=outdir,pacbamfolder_bychrom=pacbamfolder_bychrom)
+#' outpbem <- compute_pbem(sample.info.file,targetbed,pacbamfolder_bychrom,outdir)
 #' @return list(bperr, bperr_summary, bperr_tabstat)
 compute_pbem <- function(sample.info.file,
                          targetbed,

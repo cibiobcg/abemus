@@ -24,7 +24,7 @@ targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
 pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
 pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
 controls_dir <- system.file("extdata", "Controls", package = "abemus")
-calls <- callsnvs(sample.info.file = sample.info.file,outdir=outdir,targetbed=targetbed,pbem_dir=pbem_dir,controls_dir=controls_dir,pacbamfolder_bychrom=pacbamfolder_bychrom,replicas = 2)
-tabindex <- calls$tabsnvs_index
+m<-callsnvs(sample.info.file,outdir,targetbed,pbem_dir,controls_dir,pacbamfolder_bychrom,replicas=1)
+tabindex <- m$tabsnvs_index
 tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
 }
