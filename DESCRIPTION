@@ -1,7 +1,7 @@
 Package: abemus
 Type: Package
 Title: Adaptive Base Error Model in Ultra-Deep Sequencing Data
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(person("Nicola", "Casiraghi", role=c("aut", "cre"), email="casiraghinicola@gmail.com"),
              person("Francesco", "Orlando", role=c("aut")),
              person("Alessandro", "Romanel", role=c("aut")),

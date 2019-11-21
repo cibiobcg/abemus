@@ -1,2 +1,2 @@
 AFbycov	spec	mincov	minalt	mincovgerm	maxafgerm	filtering_date
-TRUE	0.995	10	1	10	0.2	2019-11-11 16:46:28
+TRUE	0.995	10	1	10	0.2	2019-11-21 14:53:33
