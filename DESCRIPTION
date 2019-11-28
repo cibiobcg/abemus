@@ -3,11 +3,11 @@ Type: Package
 Title: Adaptive Base Error Model in Ultra-Deep Sequencing Data
 Version: 1.0.1
 Authors@R: c(person("Nicola", "Casiraghi", role=c("aut", "cre"), email="casiraghinicola@gmail.com"),
-             person("Francesco", "Orlando", role=c("aut")),
              person("Alessandro", "Romanel", role=c("aut")),
-             person("Francesca", "Demichelis", role=c("aut")))
-Description: Platform specific and data informed detection of somatic single nucleotide variants in circulating free DNA.
-License: GPL-3 | file LICENSE
+             person("Francesco", "Orlando", role=c("ctb")),
+             person("Francesca", "Demichelis", role=c("ctb")))
+Description: The use of liquid biopsies for cancer patients enables the non-invasive tracking of treatment response and tumor dynamics through single or serial blood drawn tests. Next generation sequencing assays allow for the simultaneous interrogation of extended sets of somatic single nucleotide variants (SNVs) in circulating cell free DNA (cfDNA), a mixture of DNA molecules originating both from normal and tumor tissue cells. However, low circulating tumor DNA (ctDNA) fractions together with sequencing background noise and potential tumor heterogeneity challenge the ability to confidently call SNVs. We present a computational methodology, called Adaptive Base Error Model in Ultra-deep Sequencing data (ABEMUS), which combines platform-specific genetic knowledge and empirical signal to readily detect and quantify somatic SNVs in cfDNA. We tested the capability of our method to analyze data generated using different platforms with distinct sequencing error properties and we compared ABEMUS performances with other popular SNV callers on both synthetic and real cancer patients sequencing data. Results show that ABEMUS performs better in most of the tested conditions proving its reliability in calling low variant allele frequencies somatic SNVs in low ctDNA levels plasma samples.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
