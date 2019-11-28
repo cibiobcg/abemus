@@ -2,20 +2,20 @@
 % Please edit documentation in R/get_case_mean_coverage.R
 \name{get_case_mean_coverage}
 \alias{get_case_mean_coverage}
-\title{Compute the mean coverage of a case sample}
+\title{Compute the mean coverage of a CASE sample}
 \usage{
 get_case_mean_coverage(tabindex, pacbamfolder_bychrom)
 }
 \arguments{
-\item{tabindex}{output calls$tabsnvs_index from callsnvs() function.}
+\item{tabindex}{The data.frame output by the \code{callsnvs} function.}
 
-\item{pacbamfolder_bychrom}{folder with pileups split by chromosome.}
+\item{pacbamfolder_bychrom}{The folder popluted by outputs by the \code{split_pacbam_bychrom} function.}
 }
 \value{
-sample.info.file with 1 additional column reporting the mean coverage for each case having a matched-control
+The \code{sample.info.file} with an additional column reporting the mean coverage for each case (only for those with a matched-CONTROL)
 }
 \description{
-Compute the mean coverage of a case sample
+Compute the mean coverage of a CASE sample
 }
 \examples{
 sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")

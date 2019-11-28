@@ -7,12 +7,12 @@
 get_target_size(targetbed, Mbp = TRUE)
 }
 \arguments{
-\item{targetbed}{targeted regions in BED format}
+\item{targetbed}{Genomic regions in the BED tab-delimited format.}
 
-\item{Mbp}{return count as Mbp. default: TRUE}
+\item{Mbp}{Return count as Mbp. default: TRUE}
 }
 \value{
-Mbp covered in the BED file
+Mbp covered in the \code{targetbed}
 }
 \description{
 Compute total number of loci covered in a BED file

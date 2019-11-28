@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_pbem.R
 \name{compute_pbem}
 \alias{compute_pbem}
-\title{Compute per-base error model on each targeted position and save AFs by bins of coverage}
+\title{Compute the per-base error measure (pbem) for each targeted locus and save allelic (AF) by bins of coverage.}
 \usage{
 compute_pbem(sample.info.file, targetbed, pacbamfolder_bychrom, outdir,
   outdir.bperr.name = "BaseErrorModel", coverage_binning = 50,
@@ -12,37 +12,39 @@ compute_pbem(sample.info.file, targetbed, pacbamfolder_bychrom, outdir,
   n_pos_af_th = 0.2, mc.cores = 1, step = 5000)
 }
 \arguments{
-\item{sample.info.file}{sample info file listing cases and controls. tab-delimeted file}
+\item{sample.info.file}{The sample info file listing CASE and CONTROL samples. The format is simply 5 columns, tab-delimited, and there is no column header.}
 
-\item{targetbed}{targeted regions in BED format.}
+\item{targetbed}{Genomic regions in the BED tab-delimited format.}
 
-\item{pacbamfolder_bychrom}{folder with pileups}
+\item{pacbamfolder_bychrom}{The folder popluted by outputs by the \code{split_pacbam_bychrom} function.}
 
-\item{outdir}{output folder for this step analysis}
+\item{outdir}{The folder where outputs will be saved.}
 
-\item{outdir.bperr.name}{folder will be created in outdir. default: "BaseErrorModel"}
+\item{outdir.bperr.name}{The subfolder name that will be created in the \code{outdir}. default: "BaseErrorModel"}
 
-\item{coverage_binning}{Bins of coverage into which divide allelic fractions. default: 50}
+\item{coverage_binning}{Bins of coverage into which divide AFs. default: 50}
 
-\item{af_max_to_compute_thresholds}{To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2}
+\item{af_max_to_compute_thresholds}{To compute AF thresholds, consider only positions with AF <= \code{af_max_to_compute_thresholds}. default 0.2}
 
-\item{coverage_min_to_compute_thresholds}{To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10}
+\item{coverage_min_to_compute_thresholds}{To compute AF threshold, consider only positions with coverage >= \code{coverage_min_to_compute_thresholds}. default 10}
 
-\item{af_max_to_compute_pbem}{To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2}
+\item{af_max_to_compute_pbem}{To compute pbem, consider only positions with AF <= \code{af_max_to_compute_pbem}. default: 0.2}
 
-\item{coverage_min_to_compute_pbem}{To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10}
+\item{coverage_min_to_compute_pbem}{To compute pbem, consider only positions with coverage >= \code{coverage_min_to_compute_pbem}. default: 10}
 
-\item{n_pos_af_th}{When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2}
+\item{n_pos_af_th}{When compute pbem, count in how many germline samples the position has an AF >= \code{n_pos_af_th}. default: 0.2}
 
-\item{mc.cores}{mc.core param from mclapply. default: 1}
+\item{mc.cores}{Number of jobs to run in parallel, it is the \code{mc.core} param of the \code{mclapply} function. default: 1}
 
-\item{step}{into how many positions to split the chrom file. default: 5000}
+\item{step}{Number of positions into split the input chromosome file. default: 5000}
 }
 \value{
-list(bperr, bperr_summary, bperr_tabstat)
+The \code{compute_pbem} will write, in the \code{outdir.bperr.name}, tab-delimeted files reporting the per-base error measure of each targeted locus (saved in \code{bperr.tsv}), the coverage and the AF of loci with AF > 0 (saved in \code{afgtz.tsv}) and the coverage of loci with AF = 0 (saved in \code{afz.tsv}).
+
+The function also return objects \code{bgpbem}, \code{bperr_summary} and \code{mean_pbem} reporting overall statistics about the per-base error measure.
 }
 \description{
-Compute per-base error model on each targeted position and save AFs by bins of coverage
+Compute the per-base error measure (pbem) for each targeted locus and save allelic (AF) by bins of coverage.
 }
 \examples{
 sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")

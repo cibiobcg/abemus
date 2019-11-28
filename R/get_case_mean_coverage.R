@@ -1,6 +1,8 @@
-#' Compute the mean coverage of a case sample
-#' @param tabindex output calls$tabsnvs_index from callsnvs() function.
-#' @param pacbamfolder_bychrom folder with pileups split by chromosome.
+#' Compute the mean coverage of a CASE sample
+#' @param tabindex The data.frame output by the \code{callsnvs} function.
+#' @param pacbamfolder_bychrom The folder popluted by outputs by the \code{split_pacbam_bychrom} function.
+#' @return The \code{sample.info.file} with an additional column reporting the mean coverage for each case (only for those with a matched-CONTROL)
+#' @export
 #' @examples
 #' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
 #' outdir <- tempdir()
@@ -11,8 +13,6 @@
 #' m<-callsnvs(sample.info.file,outdir,targetbed,pbem_dir,controls_dir,pacbamfolder_bychrom,replicas=1)
 #' tabindex <- m$tabsnvs_index
 #' tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
-#' @return sample.info.file with 1 additional column reporting the mean coverage for each case having a matched-control
-#' @export
 get_case_mean_coverage <- function(tabindex,
                                    pacbamfolder_bychrom){
 

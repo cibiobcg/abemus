@@ -2,25 +2,25 @@
 % Please edit documentation in R/apply_scaling_factor.R
 \name{apply_scaling_factor}
 \alias{apply_scaling_factor}
-\title{Apply the scaling factor R on the pbem}
+\title{Apply the scaling factor R to get the most suitable locus-specific AF threshold.}
 \usage{
 apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE,
   target_size = NA)
 }
 \arguments{
-\item{tabindex}{output from callsnvs(). (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())}
+\item{tabindex}{The data.frame output from the \code{callsnvs} function. (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())}
 
-\item{R}{scaling factor to be applied at filter.pbem_coverage value. default = 1}
+\item{R}{The scaling factor R to adjust the AF threshold. default = 1 (neutral value, no changes)}
 
-\item{use.optimal.R}{Automatically use the best R given mean coverage of the case sample and size of targeted regions. default: FALSE}
+\item{use.optimal.R}{Automatically use the best scaling factor R given the mean coverage of the CASE sample and size of targeted regions. default: FALSE}
 
-\item{target_size}{(if use.optimal.R = TRUE) target size in Mb of the BED file. Use get_target_size()}
+\item{target_size}{if use.optimal.R = TRUE, target size in Mb of the BED file as provided by the \code{get_target_size} fuction.}
 }
 \value{
-The most suitable scaling factor R to be appliced to call SNVs
+Given the combination of coverage, allelic fraction and pbem, return the most suitable scaling factor R to adjust the AF threshold.
 }
 \description{
-Apply the scaling factor R on the pbem
+Apply the scaling factor R to get the most suitable locus-specific AF threshold.
 }
 \examples{
 sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")

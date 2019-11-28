@@ -1,25 +1,26 @@
-#' Compute per-base error model on each targeted position and save AFs by bins of coverage
+#' Compute the per-base error measure (pbem) for each targeted locus and save allelic (AF) by bins of coverage.
+#' @param sample.info.file The sample info file listing CASE and CONTROL samples. The format is simply 5 columns, tab-delimited, and there is no column header.
+#' @param targetbed Genomic regions in the BED tab-delimited format.
+#' @param pacbamfolder_bychrom The folder popluted by outputs by the \code{split_pacbam_bychrom} function.
+#' @param outdir The folder where outputs will be saved.
+#' @param outdir.bperr.name The subfolder name that will be created in the \code{outdir}. default: "BaseErrorModel"
+#' @param coverage_binning Bins of coverage into which divide AFs. default: 50
+#' @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= \code{af_max_to_compute_thresholds}. default 0.2
+#' @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= \code{coverage_min_to_compute_thresholds}. default 10
+#' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= \code{af_max_to_compute_pbem}. default: 0.2
+#' @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= \code{coverage_min_to_compute_pbem}. default: 10
+#' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= \code{n_pos_af_th}. default: 0.2
+#' @param mc.cores Number of jobs to run in parallel, it is the \code{mc.core} param of the \code{mclapply} function. default: 1
+#' @param step Number of positions into split the input chromosome file. default: 5000
+#' @return The \code{compute_pbem} will write, in the \code{outdir.bperr.name}, tab-delimeted files reporting the per-base error measure of each targeted locus (saved in \code{bperr.tsv}), the coverage and the AF of loci with AF > 0 (saved in \code{afgtz.tsv}) and the coverage of loci with AF = 0 (saved in \code{afz.tsv}).
+#' @return The function also return objects \code{bgpbem}, \code{bperr_summary} and \code{mean_pbem} reporting overall statistics about the per-base error measure.
 #' @export
-#' @param sample.info.file sample info file listing cases and controls. tab-delimeted file
-#' @param targetbed targeted regions in BED format.
-#' @param pacbamfolder_bychrom folder with pileups
-#' @param outdir output folder for this step analysis
-#' @param outdir.bperr.name folder will be created in outdir. default: "BaseErrorModel"
-#' @param coverage_binning Bins of coverage into which divide allelic fractions. default: 50
-#' @param af_max_to_compute_thresholds To compute AF thresholds, consider only positions with AF <= af_max_to_compute_thresholds. default 0.2
-#' @param coverage_min_to_compute_thresholds To compute AF threshold, consider only positions with coverage >= coverage_min_to_compute_thresholds. default 10
-#' @param af_max_to_compute_pbem To compute pbem, consider only positions with AF <= af_max_to_compute_pbem. default: 0.2
-#' @param coverage_min_to_compute_pbem To compute pbem, consider only positions with coverage >= coverage_min_to_compute_pbem. default: 10
-#' @param n_pos_af_th When compute pbem, count in how many germline samples the position has an AF >= n_pos_af_th. default: 0.2
-#' @param mc.cores mc.core param from mclapply. default: 1
-#' @param step into how many positions to split the chrom file. default: 5000
 #' @examples
 #' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
 #' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
 #' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
 #' outdir <- tempdir()
 #' outpbem <- compute_pbem(sample.info.file,targetbed,pacbamfolder_bychrom,outdir)
-#' @return list(bperr, bperr_summary, bperr_tabstat)
 compute_pbem <- function(sample.info.file,
                          targetbed,
                          pacbamfolder_bychrom,

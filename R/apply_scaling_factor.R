@@ -1,10 +1,10 @@
-#' Apply the scaling factor R on the pbem
-#'
+#' Apply the scaling factor R to get the most suitable locus-specific AF threshold.
+#' @param tabindex The data.frame output from the \code{callsnvs} function. (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())
+#' @param R The scaling factor R to adjust the AF threshold. default = 1 (neutral value, no changes)
+#' @param use.optimal.R Automatically use the best scaling factor R given the mean coverage of the CASE sample and size of targeted regions. default: FALSE
+#' @param target_size if use.optimal.R = TRUE, target size in Mb of the BED file as provided by the \code{get_target_size} fuction.
+#' @return Given the combination of coverage, allelic fraction and pbem, return the most suitable scaling factor R to adjust the AF threshold.
 #' @export
-#' @param tabindex output from callsnvs(). (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())
-#' @param R scaling factor to be applied at filter.pbem_coverage value. default = 1
-#' @param use.optimal.R Automatically use the best R given mean coverage of the case sample and size of targeted regions. default: FALSE
-#' @param target_size (if use.optimal.R = TRUE) target size in Mb of the BED file. Use get_target_size()
 #' @examples
 #' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
 #' outdir <- tempdir()
@@ -16,7 +16,6 @@
 #' tabindex <- m$tabsnvs_index
 #' tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
 #' m$tabsnvs_index_scalfact <- apply_scaling_factor(tabindex = tabindex)
-#' @return The most suitable scaling factor R to be appliced to call SNVs
 apply_scaling_factor <- function(tabindex,
                                  R = 1,
                                  use.optimal.R = FALSE,

@@ -1,9 +1,9 @@
-#' From BED format file to a list of loci
+#' Unwrap a list of genomic intervals into a list of loci grouped by chromosome.
 #' @param targetbed Genomic regions in the BED tab-delimited format.
-#' @param get_only_chromosomes return only the list of chromosomes in the BED file. default: FALSE
-#' @param chrom_to_extract the chromosome name to extract as i.e. "chr1" or "1" accordingly with BED file annotation
-#' @return PosByChrom A list of data.frames, each for each chromosome.
-#' @return chromosomes The chromosomes included in the BED file.
+#' @param get_only_chromosomes Set TRUE to return only the list of \code{chromosomes} present in the \code{targetbed}. default: FALSE
+#' @param chrom_to_extract The chromosome name to extract as i.e. "chr1" or "1" accordingly with BED file annotation
+#' @return \code{PosByChrom}:  A list of data.frames (each row is a locus) one for each chromosome present in the \code{targetbed}.
+#' @return \code{chromosomes}: A vector listing chromosomes present in the \code{targetbed}.
 #' @examples
 #' targetbed <- system.file("extdata", "regions_toy.bed",package = "abemus")
 #' chromosomes <- bed2positions(targetbed = targetbed,chrom_to_extract="8")
