@@ -155,7 +155,7 @@ target_size <- get_target_size(targetbed = targetbed, Mbp = TRUE)
 
 calls$tabsnvs_index_scalfact <- apply_scaling_factor(tabindex = tabindex,
                                                      target_size = target_size,
-                                                     use.optimal.R = TRUE,
+                                                     use.optimal.R = TRUE)
 
 head( calls$tabsnvs_index_scalfact )
 
