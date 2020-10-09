@@ -50,7 +50,7 @@ pos2bperr = function(id,
     message(paste("[",Sys.time(),"]\tpositions in ",outfile,"not found in any pileups."))
   } else {
     completetab_all = read.delim(filtpileup,stringsAsFactors = FALSE,header = FALSE,sep = "\t",na.strings = "")
-    names(completetab_all) <- c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD","dbsnp")
+    names(completetab_all) <- c("chr","pos","ref","Ade","Cyt","Gua","Thy","af","RD")
     # exclude annotated and private SNPs [ to compute AF threshold]
     completetab = completetab_all[which(is.na(completetab_all$dbsnp)),,drop=FALSE]
     completetab = completetab[which(completetab$af <= af_max_to_compute_thresholds & completetab$RD >= coverage_min_to_compute_thresholds),,drop=FALSE]
