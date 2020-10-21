@@ -117,7 +117,7 @@ compute_pbem <- function(sample.info.file,
   # overall statistics on pbems
   merge.files <- list.files(path = ".",pattern = "bperr_",full.names = TRUE)
   mrgd <- lapply(merge.files,fread,data.table=FALSE,stringsAsFactors = FALSE,header = FALSE)
-  sapply(length(mrgd),function (x) write.table(mrgd[[x]],file="bperr.tsv",append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
+  sapply(seq_len(length(mrgd)),function (x) write.table(mrgd[[x]],file="bperr.tsv",append = TRUE,quote=FALSE,col.names=FALSE,row.names = FALSE,sep = "\t"))
 
   pbem_tab <- fread(file.path(outdir, outdir.bperr.name,"bperr.tsv"),stringsAsFactors = FALSE,showProgress = FALSE,header = FALSE,colClasses = list(character=2,character=5),data.table = FALSE)
   header_pbem_tab <- c("group","chr","pos","ref","dbsnp","tot_coverage","total.A","total.C","total.G","total.T","n_pos_available","n_pos_af_lth","n_pos_af_gth","count.A_af_gth","count.C_af_gth","count.G_af_gth","count.T_af_gth","bperr","tot_reads_supporting_alt")
