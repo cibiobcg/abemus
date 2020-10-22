@@ -90,7 +90,7 @@ pos2bperr = function(id,
       #this_ans = merge(x = this,y = ans,by = "group",all.y = T)
       #this_ans = as.data.frame(this_ans)
 
-      tabstats <- do.call("rbind", lapply(seq(1,nrow(this_ans),1),get_pbem,tgf=this_ans))
+      tabstats <- do.call(rbind, lapply(seq(1,nrow(this_ans),1),get_pbem,tgf=this_ans))
       #tabstats <- tabstats[with(tabstats, order(pos)), ]
 
       message(paste("[",Sys.time(),"]\twriting output for positions in: ",filtpileup))
