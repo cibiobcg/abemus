@@ -183,10 +183,16 @@ bin_vafth <- function(bin,vaf,covbin,spec){
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 
-# hm <- ggplot(vafth_by_bin, aes(x = bin, y = as.factor(spec), fill = th)) + geom_tile()
-
-
-
+# improve [!]
+# vafth_by_bin$spec.bin <- cut(vafth_by_bin$spec,breaks = seq(0.9,1,0.01),include.lowest = TRUE)
+# for(sb in levels(vafth_by_bin$spec.bin)){
+#   df <- vafth_by_bin[which(vafth_by_bin$spec.bin == sb),]
+#   hm <- ggplot(df, aes(x = bin, y = as.factor(spec), fill = th)) +
+#     geom_tile() +
+#     facet_wrap(~spec.bin,scales = "free") +
+#     scale_fill_distiller(palette = 'RdYlBu')
+#   print(hm)
+# }
 
 
 
