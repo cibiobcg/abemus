@@ -79,38 +79,40 @@ for(base in names(dict)){
 }
 
 # [ compute pbem ]
-# coverage_binning = 50
-# af_max_to_compute_pbem = 0.2
-# coverage_min_to_compute_pbem = 10
-# mc.cores = 1
-# n_pos_af_th = 0.2
-# step = 5000
+max.vaf.pbem <- af_max_to_compute_pbem <- 0.2
+cov.min.pbem <- coverage_min_to_compute_pbem <- 10
 
 chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
 
   x <- rep(NA,length(ref[[i]]))
 
-  den <- rowSums(mat_cov[[i]],na.rm = TRUE)
+  mat_cov_chr <- mat_cov[[i]]
 
-  # ref A
-  idx <- which(ref[[i]] == 'A')
-  num <- rowSums(mat_cov_base[['C']][[i]][idx,] + mat_cov_base[['G']][[i]][idx,] + mat_cov_base[['T']][[i]][idx,],na.rm = TRUE)
-  x[idx] <- num/den[idx]
+  filtout <- unique(rbind(which(mat_cov_chr < cov.min.pbem,arr.ind = TRUE),
+                          which(mat_vaf[[i]] > max.vaf.pbem,arr.ind = TRUE)))
 
-  # ref C
-  idx <- which(ref[[i]] == 'C')
-  num <- rowSums(mat_cov_base[['A']][[i]][idx,] + mat_cov_base[['G']][[i]][idx,] + mat_cov_base[['T']][[i]][idx,],na.rm = TRUE)
-  x[idx] <- num/den[idx]
+  mat_cov_chr[filtout] <- NA
 
-  # ref G
-  idx <- which(ref[[i]] == 'G')
-  num <- rowSums(mat_cov_base[['A']][[i]][idx,] + mat_cov_base[['C']][[i]][idx,] + mat_cov_base[['T']][[i]][idx,],na.rm = TRUE)
-  x[idx] <- num/den[idx]
+  den <- rowSums(mat_cov_chr,na.rm = TRUE)
 
-  # ref T
-  idx <- which(ref[[i]] == 'T')
-  num <- rowSums(mat_cov_base[['A']][[i]][idx,] + mat_cov_base[['C']][[i]][idx,] + mat_cov_base[['G']][[i]][idx,],na.rm = TRUE)
-  x[idx] <- num/den[idx]
+  # hist(den)
+
+  ext <- function(lst,n){
+    sapply(lst,FUN = '[',n)
+  }
+
+  xxx <- ext(mat_cov_base[setdiff(c('A','C','G','T'),base)],n = i)
+
+  get_num <- function(alt,idx,filtout){
+    alt[filtout,] <- NA
+    rowSums(alt[idx,],na.rm = TRUE)
+  }
+
+  idx <- which(ref[[i]] == base)
+
+  num <- sapply(xxx,get_num,idx,filtout)
+
+  x[idx] <- rowSums(num)/den[idx]
 
   return(x)
 }
