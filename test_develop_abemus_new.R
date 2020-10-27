@@ -129,37 +129,61 @@ pbem_by_chrom <- lapply(seq_len(length(ref)),chrom_pbem,mat_cov,mat_cov_base,ref
 # coverage_binning = 50,
 # probs = seq(0.9,1,0.0001)){
 
-spec <- 0.995
+spec <- seq(0.9,1,0.0001)
 max.vaf <- 0.2
 min.cov <- 10
 bin.cov <- 50
 
 # roll over chromosomes [!]
-cov <- as.vector(mat_cov[[i]])
-cov[which(cov < min.cov)] <- NA
 
-vaf <- as.vector(mat_vaf[[i]])
-vaf[which(vaf > max.vaf)] <- NA
+chrom_cov_vaf <- function(i,mat_cov,mat_vaf){
 
-# vaf and cov must be genome wide [!]
+  cov <- as.vector(mat_cov[[i]])
+  cov[which(cov < min.cov)] <- NA
+
+  vaf <- as.vector(mat_vaf[[i]])
+  vaf[which(vaf > max.vaf)] <- NA
+
+  return(list(cov,vaf))
+}
+
+cov_vaf_by_chrom <- lapply(seq_len(length(ref)),chrom_cov_vaf,mat_cov,mat_vaf)
+
+# vaf threshold not cov based
+
+ext <- function(lst,n){
+  sapply(lst,FUN = '[',n)
+}
+
+vaf <- as.vector(unlist(ext(cov_vaf_by_chrom,2)))
+
+vaf.th <- data.frame(spec=spec,
+                     th=as.numeric(quantile(vaf,probs = spec,na.rm = TRUE)),
+                     stringsAsFactors = FALSE)
+
+# vaf threshold cov based
+
+cov <- as.vector(unlist(ext(cov_vaf_by_chrom,1)))
 
 covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
               include.lowest=TRUE)
+
 barplot(table(covbin),las=2,cex.names = 0.4)
 
-for(bin in levels(covbin)){
-  message(bin)
-  m <- vaf[which(covbin == bin)]
-  quantile(m,probs = spec)
+bin_vafth <- function(bin,vaf,covbin,spec){
+
+  vaf.thbin <- data.frame(bin=bin,
+                          spec=spec,
+                          th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
+                          stringsAsFactors = FALSE)
+
+  return(vaf.thbin)
 }
 
-head(vaf)
-head(covbin)
+vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 
-
-
-
+# hm <- ggplot(vafth_by_bin, aes(x = bin, y = as.factor(spec), fill = th)) + geom_tile()
 
 
 
