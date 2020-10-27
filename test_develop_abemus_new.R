@@ -101,18 +101,22 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
     sapply(lst,FUN = '[',n)
   }
 
-  xxx <- ext(mat_cov_base[setdiff(c('A','C','G','T'),base)],n = i)
-
   get_num <- function(alt,idx,filtout){
     alt[filtout,] <- NA
     rowSums(alt[idx,],na.rm = TRUE)
   }
 
-  idx <- which(ref[[i]] == base)
+  for(base in c('A','C','G','T')){
 
-  num <- sapply(xxx,get_num,idx,filtout)
+    alt_list <- ext(mat_cov_base[setdiff(c('A','C','G','T'),base)],n = i)
 
-  x[idx] <- rowSums(num)/den[idx]
+    idx <- which(ref[[i]] == base)
+
+    num <- sapply(alt_list, get_num, idx, filtout)
+
+    x[idx] <- rowSums(num)/den[idx]
+
+  }
 
   return(x)
 }
