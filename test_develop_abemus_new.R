@@ -7,7 +7,7 @@ library(Matrix)
 library(abemus)
 
 outdir <-  "/BCGLAB/ncasiraghi/abemus_test_develop_branch"
-sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sample_info_toy.txt"
+sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif_new.txt"
 targetbed <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/TST170_DNA_target.nochr.merged.nochromY.bed"
 pacbamfolder_bychrom <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/bychrom/"
 
@@ -21,6 +21,19 @@ import_sif <- function(main_sif){
   df_cases <- df[which(!is.na(df$plasma.bam)),,drop=FALSE]
   return(list(df_ctrl=df_ctrl,df_cases=df_cases))
 }
+
+read.sif <- function(file){
+  sif <- list(ctrl=NA)
+  tsv <- read.delim(file,header = FALSE,sep = '\t',stringsAsFactors = FALSE)
+  if(ncol(tsv) == 1){
+    sif$ctrl <- unique(tsv[which(!is.na(tsv[,1])),])
+  } else{
+    sif$ctrl <- unique(tsv[which(!is.na(tsv[,2])),])
+  }
+  return(sif)
+}
+
+sif <- read.sif(sample.info.file)
 
 sif <- import_sif(sample.info.file)
 
