@@ -30,7 +30,6 @@ bed2positions <- function(targetbed,
     PosByChrom <- data.frame(chr=chrom_to_extract,
                              pos=as.numeric(unlist( apply(bed_chrom, MARGIN=1,FUN = unwrap))),
                              stringsAsFactors = FALSE)
-    #PosByChrom$group <- paste(PosByChrom$chr,PosByChrom$pos,sep=":")
 
     return(list(chromosomes=chromosomes, PosByChrom=PosByChrom))
 
