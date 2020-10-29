@@ -11,9 +11,6 @@ pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
 
 chroms <- c(1:22,'X','Y')
 
-# targetbed <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/TST170_DNA_target.nochr.merged.nochromY.bed"
-# outdir <-  "/BCGLAB/ncasiraghi/abemus_test_develop_branch"
-
 read.sif <- function(file){
   sif <- list(ctrl=NA)
   tsv <- read.delim(file,header = FALSE,sep = '\t',stringsAsFactors = FALSE)
