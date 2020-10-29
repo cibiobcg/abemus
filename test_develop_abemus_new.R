@@ -1,101 +1,97 @@
 library( devtools )
 devtools::install_github("cibiobcg/abemus", build_vignettes = T,ref = 'develop')
+library(abemus)
 
 library(data.table)
 library(parallel)
 library(Matrix)
-library(abemus)
 
-outdir <-  "/BCGLAB/ncasiraghi/abemus_test_develop_branch"
-sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif_new.txt"
-targetbed <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/TST170_DNA_target.nochr.merged.nochromY.bed"
-pacbamfolder_bychrom <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/bychrom/"
+sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
+pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
 
-import_sif <- function(main_sif){
-  df  <-  read.delim(main_sif,as.is=TRUE,stringsAsFactors = FALSE,header = FALSE)
-  colnames(df) <- c("patient","plasma","plasma.bam","germline","germline.bam")
-  # remove NAs and keep only unique germline samples
-  df_ctrl <- df[which(!is.na(df$germline.bam)),,drop=FALSE]
-  df_ctrl <- unique(df_ctrl[,c(4,5)])
-  # remove NAs and keep only case samples having matched germline samples
-  df_cases <- df[which(!is.na(df$plasma.bam)),,drop=FALSE]
-  return(list(df_ctrl=df_ctrl,df_cases=df_cases))
-}
+chroms <- c(1:22,'X','Y')
+
+# targetbed <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/TST170_DNA_target.nochr.merged.nochromY.bed"
+# outdir <-  "/BCGLAB/ncasiraghi/abemus_test_develop_branch"
 
 read.sif <- function(file){
   sif <- list(ctrl=NA)
   tsv <- read.delim(file,header = FALSE,sep = '\t',stringsAsFactors = FALSE)
   if(ncol(tsv) == 1){
-    sif$ctrl <- unique(tsv[which(!is.na(tsv[,1])),])
+    sif$case <- gsub(unique(basename(tsv[,1])),pattern = '\\.bam$',replacement = '')
+    sif$ctrl <- sif$ctrl
   } else{
-    sif$ctrl <- unique(tsv[which(!is.na(tsv[,2])),])
+    sif$case <- gsub(unique(basename(tsv[,1])),pattern = '\\.bam$',replacement = '')
+    sif$ctrl <- gsub(unique(basename(tsv[,2])),pattern = '\\.bam$',replacement = '')
   }
   return(sif)
 }
 
+get_loci <- function(chr,pacbam,select='ref',nThread=4){
+  p <- list.files(pacbam,pattern = paste0('_chr',chr,'.pileup$'),full.names = TRUE)[1]
+  if (is.na(p)) {
+    return(NA)
+  } else{
+    df <- fread(input = p,
+                sep = '\t',
+                stringsAsFactors = FALSE,
+                header = TRUE,
+                select = select,
+                verbose = FALSE,
+                data.table = FALSE,
+                nThread = nThread)
+    return(as.vector(unlist(df)))
+  }
+}
+
+pileup2mat <- function(chr,sif,pacbam,select,sparse=FALSE,nThread=4){
+  id <- paste0(sif$ctrl,paste0('_chr',chr),'.pileup')
+  ff <- file.path(pacbam,id)
+  ff <- ff[which(file.exists(ff))]
+  if(length(ff) == 0){
+    return(NA)
+  } else{
+    df <- lapply(ff,
+                 fread,
+                 sep = '\t',
+                 stringsAsFactors = FALSE,
+                 header = TRUE,
+                 select = select,
+                 verbose = FALSE,
+                 data.table = FALSE,
+                 nThread = nThread)
+    if(sparse){
+      return(Matrix(as.matrix(do.call(cbind,df)), sparse = TRUE))
+    } else {
+      return(as.matrix(do.call(cbind,df)))
+    }
+  }
+}
+
+# workflow
+
 sif <- read.sif(sample.info.file)
 
-sif <- import_sif(sample.info.file)
+ref <- lapply(chroms,get_loci,pacbam,select = 'ref')
 
-bed <- bed2positions(targetbed = targetbed,get_only_chromosomes = TRUE)
+mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=TRUE)
 
-get_germlineset <- function(sifgerm,pacbamfolder_bychrom,chrom){
-  germlineset = c()
-  chrom <- gsub(chrom,pattern = 'chr',replacement = '')
-  for(id in seq_len(nrow(sifgerm))){
-    thisSample=sifgerm[id,]
-    name = gsub(basename(thisSample$germline.bam),pattern = ".bam",replacement = "")
-    thisPileup.file = list.files(file.path(pacbamfolder_bychrom,name,"pileup"),full.names = TRUE,pattern = paste0("_chr",chrom,"\\.pileup$"))
-    germlineset = c(germlineset,thisPileup.file)
-  }
-  germlineset <- unique(germlineset)
-  return(germlineset)
-}
+mat_cov <- lapply(chroms,pileup2mat,sif,pacbam,select='cov',sparse=FALSE)
 
-getInfo <- function(chrom,sif,pacbamfolder_bychrom,select){
-  germlineset <- get_germlineset(sifgerm = sif$df_ctrl,
-                                 pacbamfolder_bychrom = pacbamfolder_bychrom,
-                                 chrom = chrom)
-  df <- fread(germlineset[1],
-              sep = '\t',
-              stringsAsFactors = FALSE,
-              skip = 1,select = select,
-              verbose = FALSE,
-              data.table=FALSE,
-              nThread = 4)
-  return(as.vector(unlist(df)))
-}
-
-pileup2mat <- function(chrom,sif,pacbamfolder_bychrom,select,sparse=FALSE){
-  germlineset <- get_germlineset(sifgerm = sif$df_ctrl,
-                                 pacbamfolder_bychrom = pacbamfolder_bychrom,
-                                 chrom = chrom)
-  df <- lapply(germlineset,fread,sep = '\t',stringsAsFactors = FALSE,skip = 1,select = select,verbose = FALSE,data.table=FALSE, nThread = 4)
-  if(sparse){
-    return(Matrix(as.matrix(do.call(cbind,df)), sparse = TRUE))
-  } else {
-    return(as.matrix(do.call(cbind,df)))
-  }
-}
-
-ref <- lapply(bed$chromosomes,getInfo,sif,pacbamfolder_bychrom,select=3)
-pos <- lapply(bed$chromosomes,getInfo,sif,pacbamfolder_bychrom,select=2)
-
-mat_vaf <- lapply(bed$chromosomes,pileup2mat,sif,pacbamfolder_bychrom,select=8,sparse=TRUE)
-mat_cov <- lapply(bed$chromosomes,pileup2mat,sif,pacbamfolder_bychrom,select=9)
-
-dict <- 4:7
-names(dict) <- c('A','C','G','T')
 mat_cov_base <- list()
-for(base in names(dict)){
-  mat_cov_base[[base]] <- lapply(bed$chromosomes,pileup2mat,sif,pacbamfolder_bychrom,select=as.integer(dict[base]),sparse=TRUE)
+for(base in c('A','C','G','T')){
+  mat_cov_base[[base]] <- lapply(chroms,pileup2mat,sif,pacbam,select=base,sparse=TRUE)
 }
 
 # [ compute pbem ]
-max.vaf.pbem <- af_max_to_compute_pbem <- 0.2
-cov.min.pbem <- coverage_min_to_compute_pbem <- 10
+max.vaf.pbem = 0.2
+cov.min.pbem = 10
 
 chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
+
+  if(all(is.na(ref[[i]]))){
+    return(NA)
+  }
 
   x <- rep(NA,length(ref[[i]]))
 
@@ -136,20 +132,17 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
 
 pbem_by_chrom <- lapply(seq_len(length(ref)),chrom_pbem,mat_cov,mat_cov_base,ref)
 
-# [ compute af threshold ] all chroms together
-# af_max_to_compute_thresholds = 0.2
-# coverage_min_to_compute_thresholds = 10
-# coverage_binning = 50,
-# probs = seq(0.9,1,0.0001)){
-
+# [ compute af thresholds ]
 spec <- seq(0.9,1,0.0001)
 max.vaf <- 0.2
 min.cov <- 10
 bin.cov <- 50
 
-# roll over chromosomes [!]
-
 chrom_cov_vaf <- function(i,mat_cov,mat_vaf){
+
+  if(all(is.na(mat_cov[[i]]))){
+    return(list(NA,NA))
+  }
 
   cov <- as.vector(mat_cov[[i]])
   cov[which(cov < min.cov)] <- NA
@@ -182,7 +175,7 @@ covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
               include.lowest=TRUE)
 
-barplot(table(covbin),las=2,cex.names = 0.4)
+# barplot(table(covbin),las=2,cex.names = 0.4)
 
 bin_vafth <- function(bin,vaf,covbin,spec){
 
