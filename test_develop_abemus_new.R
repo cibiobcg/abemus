@@ -5,6 +5,7 @@ library(abemus)
 library(data.table)
 library(parallel)
 library(Matrix)
+library(dplyr)
 
 sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
 pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
@@ -70,6 +71,7 @@ pileup2mat <- function(chr,sif,pacbam,select,sparse=FALSE,nThread=4){
 sif <- read.sif(sample.info.file)
 
 ref <- lapply(chroms,get_loci,pacbam,select = 'ref')
+pos <- lapply(chroms,get_loci,pacbam,select = 'pos')
 
 mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=TRUE)
 
@@ -94,8 +96,8 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
 
   mat_cov_chr <- mat_cov[[i]]
 
-  filtout <- unique(rbind(which(mat_cov_chr < cov.min.pbem,arr.ind = TRUE),
-                          which(mat_vaf[[i]] > max.vaf.pbem,arr.ind = TRUE)))
+  filtout <- unique(rbind(which(mat_cov_chr <= cov.min.pbem,arr.ind = TRUE),
+                          which(mat_vaf[[i]] >= max.vaf.pbem,arr.ind = TRUE)))
 
   mat_cov_chr[filtout] <- NA
 
@@ -160,9 +162,9 @@ ext <- function(lst,n){
 
 vaf <- as.vector(unlist(ext(cov_vaf_by_chrom,2)))
 
-vaf.th <- data.frame(spec=spec,
-                     th=as.numeric(quantile(vaf,probs = spec,na.rm = TRUE)),
-                     stringsAsFactors = FALSE)
+vafth <- data.frame(spec=spec,
+                    th=as.numeric(quantile(vaf,probs = spec,na.rm = TRUE)),
+                    stringsAsFactors = FALSE)
 
 # vaf threshold cov based
 
@@ -197,7 +199,49 @@ vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 #   print(hm)
 # }
 
+# [ call snvs ]
+# replicas = 1000
+# replicas.in.parallel = 1
+# coeffvar.threshold = 0.01
+# mincovgerm = 10
+# maxafgerm = 0.2
+pacbam
 
+vaf.th = vafth_by_bin
+vaf.th = vafth
+spec = 0.995
+
+min.cov = 10
+min.alt = 1
+
+callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,spec=0.995,min.cov=10,min.alt=1,nThread=4){
+  id <- paste0(case,paste0('_chr',chr),'.pabs')
+  ff <- file.path(pacbam,id)
+  if(!file.exists(ff)){
+    return(NA)
+  } else{
+    df <- fread(input = ff,
+                sep = '\t',
+                stringsAsFactors = FALSE,
+                header = TRUE,
+                verbose = FALSE,
+                data.table = FALSE,
+                nThread = nThread) %>% filter(cov >= min.cov)
+
+    # filter based on cov
+    snvs <- do.call(rbind,lapply(seq_len(nrow(df)),CheckAltReads,df)) %>% filter(cov.alt >= min.alt)
+
+    # filter based on vaf
+    if(ncol(vaf.th)==2){
+      snvs <- filter(snvs, af >= vaf.th$th[which(vafth$spec == spec)])
+    }
+
+    # filter based on pbem
+    j <- which(chr==c(1:22,'X','Y'))
+    snvs$pbem <- pbem_by_chrom[[j]][which(pos[[j]] %in% snvs$pos)]
+
+  }
+}
 
 
 
