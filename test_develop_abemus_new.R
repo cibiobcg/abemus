@@ -6,6 +6,7 @@ library(data.table)
 library(parallel)
 library(Matrix)
 library(dplyr)
+library(tidyr)
 
 sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
 pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
@@ -236,9 +237,19 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,spec=0.995,min
       snvs <- filter(snvs, af >= vaf.th$th[which(vafth$spec == spec)])
     }
 
+    if(ncol(vaf.th)==3){
+
+    }
+
     # filter based on pbem
     j <- which(chr==c(1:22,'X','Y'))
     snvs$pbem <- pbem_by_chrom[[j]][which(pos[[j]] %in% snvs$pos)]
+
+    snvs <- snvs %>% drop_na(pbem)
+
+    snvs$pbem.th <- sapply(seq_len(nrow(snvs)), function(k) bombanel_tab_cov_pbem[min(which(bombanel_covs>=snvs$cov[k])),min(which(bombanel_afs>=snvs$pbem[k]))])
+
+    snvs <- snvs %>% filter(af >= pbem.th)
 
   }
 }
