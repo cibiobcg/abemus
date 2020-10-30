@@ -9,7 +9,7 @@ CheckAltReads <- function(i,snvs){
   this$fwd.ref = fwd.ref
   if(altbase=="N"){
     altbases = setdiff(c("A","C","G","T"),refbase)
-    cov.alt = as.numeric(max(this[,altbases]))
+    cov.alt = as.numeric(sum(this[,altbases]))
     this$cov.alt <- cov.alt
     this$af <- round(cov.alt/sum(cov.alt,this[,refbase]),4)
     this$rev.alt = NA
