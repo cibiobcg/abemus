@@ -77,6 +77,7 @@ sif <- read.sif(sample.info.file)
 
 ref <- lapply(chroms,get_loci,pacbam,select = 'ref')
 pos <- lapply(chroms,get_loci,pacbam,select = 'pos')
+rsid <- lapply(chroms,get_loci,pacbam,select = 'rsid') %>% lapply(function(x) which(!is.na(x)))
 
 mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=TRUE)
 
@@ -142,7 +143,7 @@ max.vaf <- 0.2
 min.cov <- 10
 bin.cov <- 50
 
-chrom_cov_vaf <- function(i,mat_cov,mat_vaf){
+chrom_cov_vaf <- function(i,mat_cov,mat_vaf,rsid){
 
   if(all(is.na(mat_cov[[i]]))){
     return(list(NA,NA))
@@ -153,11 +154,12 @@ chrom_cov_vaf <- function(i,mat_cov,mat_vaf){
 
   vaf <- as.vector(mat_vaf[[i]])
   vaf[which(vaf > max.vaf)] <- NA
+  vaf[rsid[[i]]] <- NA
 
   return(list(cov,vaf))
 }
 
-cov_vaf_by_chrom <- lapply(seq_len(length(ref)),chrom_cov_vaf,mat_cov,mat_vaf)
+cov_vaf_by_chrom <- lapply(seq_len(length(ref)),chrom_cov_vaf,mat_cov,mat_vaf,rsid)
 
 # vaf threshold not cov based
 
@@ -212,9 +214,8 @@ vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 # maxafgerm = 0.2
 
 vaf.th = vafth_by_bin
-vaf.th = vafth
+# vaf.th = vafth
 spec = 0.995
-
 min.cov = 10
 min.alt = 1
 
@@ -224,7 +225,6 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
   if(!file.exists(ff)){
     return(NA)
   } else{
-    out <- list()
     df <- fread(input = ff,
                 sep = '\t',
                 stringsAsFactors = FALSE,
@@ -236,7 +236,6 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
 
     # filter based on cov
     snvs <- do.call(rbind,lapply(seq_len(nrow(df)),CheckAltReads,df)) %>% filter(cov.alt >= min.alt)
-    out$tab1 <- snvs
 
     # filter based on vaf
     if(ncol(vaf.th)==2){
@@ -259,7 +258,6 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
         rename(af.th = th, cov.bin = bin) %>%
         filter(af >= af.th)
     }
-    out$tab2 <- snvs
 
     # filter based on pbem
     j <- which(chr==c(1:22,'X','Y'))
@@ -269,17 +267,20 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
 
     snvs$pbem.th <- sapply(seq_len(nrow(snvs)), function(k) bombanel_tab_cov_pbem[min(which(bombanel_covs>=snvs$cov[k])),min(which(bombanel_afs>=snvs$pbem[k]))])
 
-    snvs <- snvs %>% filter(af >= pbem.th)
+    snvs <- snvs %>%
+      filter(af >= pbem.th) %>%
+      select(chr,pos,ref,alt,rsid,cov,cov.bin,cov.alt,strandbias,af,af.th,pbem,pbem.th) %>%
+      rename(vaf = af, vaf.th = af.th)
 
-    out$tab3 <- snvs
-
-    return(out)
+    return(snvs)
   }
 }
 
-
-
-
+snvs <-list()
+for(case in sif$case){
+  message(case)
+  snvs[[case]] <- do.call(rbind,mclapply(chroms,callsnvs_tmp,case,pacbam,vaf.th,pos,pbem_by_chrom,mc.cores = 4))
+}
 
 
 
