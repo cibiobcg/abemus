@@ -1,5 +1,5 @@
 library( devtools )
-devtools::install_github("cibiobcg/abemus", build_vignettes = T,ref = 'develop')
+devtools::install_github("cibiobcg/abemus", build_vignettes = F)
 library(abemus)
 
 library(data.table)
@@ -7,6 +7,8 @@ library(parallel)
 library(Matrix)
 library(dplyr)
 library(tidyr)
+library(readr)
+library(stringr)
 
 sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
 pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
@@ -38,6 +40,7 @@ get_loci <- function(chr,pacbam,select='ref',nThread=4){
                 select = select,
                 verbose = FALSE,
                 data.table = FALSE,
+                na.strings = '',
                 nThread = nThread)
     return(as.vector(unlist(df)))
   }
@@ -58,6 +61,7 @@ pileup2mat <- function(chr,sif,pacbam,select,sparse=FALSE,nThread=4){
                  select = select,
                  verbose = FALSE,
                  data.table = FALSE,
+                 na.strings = '',
                  nThread = nThread)
     if(sparse){
       return(Matrix(as.matrix(do.call(cbind,df)), sparse = TRUE))
@@ -206,7 +210,6 @@ vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 # coeffvar.threshold = 0.01
 # mincovgerm = 10
 # maxafgerm = 0.2
-pacbam
 
 vaf.th = vafth_by_bin
 vaf.th = vafth
@@ -215,31 +218,48 @@ spec = 0.995
 min.cov = 10
 min.alt = 1
 
-callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,spec=0.995,min.cov=10,min.alt=1,nThread=4){
+callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995,min.cov=10,min.alt=1,nThread=4){
   id <- paste0(case,paste0('_chr',chr),'.pabs')
   ff <- file.path(pacbam,id)
   if(!file.exists(ff)){
     return(NA)
   } else{
+    out <- list()
     df <- fread(input = ff,
                 sep = '\t',
                 stringsAsFactors = FALSE,
                 header = TRUE,
                 verbose = FALSE,
                 data.table = FALSE,
+                na.strings = '',
                 nThread = nThread) %>% filter(cov >= min.cov)
 
     # filter based on cov
     snvs <- do.call(rbind,lapply(seq_len(nrow(df)),CheckAltReads,df)) %>% filter(cov.alt >= min.alt)
+    out$tab1 <- snvs
 
     # filter based on vaf
     if(ncol(vaf.th)==2){
-      snvs <- filter(snvs, af >= vaf.th$th[which(vafth$spec == spec)])
+      snvs <- snvs %>%
+        mutate(af.th = vaf.th$th[which(vafth$spec == det.spec)]) %>%
+        filter(af >= af.th)
     }
 
     if(ncol(vaf.th)==3){
 
+      vaf.th.spec <- vaf.th %>% filter(spec == det.spec)
+      bin.cov <- diff(parse_number(str_split(vaf.th.spec$bin[1],pattern = ',',simplify = TRUE)))
+
+      snvs$bin <- cut(snvs$cov,
+                      breaks=seq(min.cov,max(snvs$cov,na.rm = TRUE),by=bin.cov),
+                      include.lowest=TRUE)
+
+      snvs <- left_join(x = snvs,y = vaf.th.spec,by = 'bin') %>%
+        select(-spec) %>%
+        rename(af.th = th, cov.bin = bin) %>%
+        filter(af >= af.th)
     }
+    out$tab2 <- snvs
 
     # filter based on pbem
     j <- which(chr==c(1:22,'X','Y'))
@@ -251,6 +271,9 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,spec=0.995,min
 
     snvs <- snvs %>% filter(af >= pbem.th)
 
+    out$tab3 <- snvs
+
+    return(out)
   }
 }
 
