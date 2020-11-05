@@ -1,7 +1,7 @@
 library( devtools )
 devtools::install_github("cibiobcg/abemus", build_vignettes = F)
-library(abemus)
 
+library(abemus)
 library(data.table)
 library(parallel)
 library(Matrix)
@@ -188,6 +188,8 @@ bin_vafth <- function(bin,vaf,covbin,spec){
   vaf.thbin <- data.frame(bin=bin,
                           spec=spec,
                           th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
+                          vaf.gtz=length(which(vaf[which(covbin == bin)] > 0)),
+                          vaf.etz=length(which(vaf[which(covbin == bin)] == 0)),
                           stringsAsFactors = FALSE)
 
   return(vaf.thbin)
@@ -195,16 +197,111 @@ bin_vafth <- function(bin,vaf,covbin,spec){
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 
-# improve [!]
-# vafth_by_bin$spec.bin <- cut(vafth_by_bin$spec,breaks = seq(0.9,1,0.01),include.lowest = TRUE)
-# for(sb in levels(vafth_by_bin$spec.bin)){
-#   df <- vafth_by_bin[which(vafth_by_bin$spec.bin == sb),]
-#   hm <- ggplot(df, aes(x = bin, y = as.factor(spec), fill = th)) +
-#     geom_tile() +
-#     facet_wrap(~spec.bin,scales = "free") +
-#     scale_fill_distiller(palette = 'RdYlBu')
-#   print(hm)
-# }
+# par(mfrow=c(3,1))
+# x <- vafth_by_bin[which(vafth_by_bin$spec == 0.995),]
+# barplot(table(covbin),las=2,cex.names = 0.4)
+# barplot(rbind(x$vaf.gtz,x$vaf.etz),beside = TRUE,names.arg = x$bin,cex.names = 0.4,las=2)
+# barplot(x$th,names.arg = x$bin,cex.names = 0.4,las=2)
+
+# [ adjust vafth_by_bin ]
+get_afth <- function(num,idx,next.bin.AFgtz,next.bin.AFetz,vaf,det.spec){
+  afth <- quantile.zaf(x = vaf[sample(x = idx,size = next.bin.AFgtz,replace = FALSE)],
+                       probs = det.spec,
+                       nz = next.bin.AFetz)
+  return(data.frame(spec=det.spec,
+                    th=as.numeric(afth),
+                    stringsAsFactors = FALSE))
+}
+
+adjust_vafth_by_bin <- function(vafth_by_bin,vaf,covbin,replicas=10,replicas.in.parallel){
+  m <- arrange(vafth_by_bin, desc(vaf.gtz),desc(vaf.etz)) %>% mutate(card = vaf.gtz + vaf.etz)
+  stop <- nrow(m)-1
+  last.stable.card <- 0
+  tab <- c()
+  det.spec <- as.numeric(unique(m$spec))
+  for(i in 1:stop){
+    current.bin <- m$bin[i]
+    current.bin.card <- m$card[i]
+    if(current.bin.card >= last.stable.card){
+      for(j in (i+1):(stop+1)){
+        next.bin <- m$bin[j]
+        next.bin.card <- m$card[j]
+        next.bin.AFetz <- m$vaf.etz[j]
+        next.bin.AFgtz <- m$vaf.gtz[j]
+        idx <- which(covbin == current.bin)
+        out <- mclapply(1:replicas,
+                       get_afth,
+                       idx=idx,
+                       next.bin.AFgtz=next.bin.AFgtz,
+                       next.bin.AFetz=next.bin.AFetz,
+                       vaf=vaf,
+                       det.spec=det.spec,
+                       mc.cores = replicas.in.parallel)
+        ReplicasTable <- do.call(rbind,out)
+        coeffvar <- as.numeric(sd(ReplicasTable$th,na.rm=TRUE)/mean(ReplicasTable$th,na.rm=TRUE))
+        if(is.na(coeffvar)){
+          coeffvar <- 0
+        }
+        x = data.frame(current.bin=current.bin,
+                       next.bin=next.bin,
+                       coeffvar=coeffvar,
+                       median.vafth=median(ReplicasTable$th,na.rm = TRUE),
+                       last.stable.card=last.stable.card,
+                       stringsAsFactors = FALSE)
+        tab=rbind(tab,x)
+        if(coeffvar > coeffvar.threshold){
+          last.stable.card = max(last.stable.card,next.bin.card)
+          break
+        }
+      }
+    }
+  }
+
+  # correct the original threhsold table
+  mcorr <- m
+  cc <- tab$last.stable.card[nrow(tab)]
+
+  last.afth.used <- 1
+  start <- 2
+  end <- length(minaf_cov_corrected)-1
+
+  for(i in start:end){
+    bin.name <- mcorr$bin[i]
+    bin.card <- mcorr$card[which(mcorr$bin == bin.name)]
+    if(!identical(bin.card,numeric(0))){
+      if(bin.card < cc & last.afth.used == 1){
+        mcorr$th[i] <- last.afth.used
+      }
+      if(bin.card >= cc){
+        last.afth.used <- mcorr$th[i]
+      }
+      if(bin.card < cc & last.afth.used != 1){
+        mcorr$th[i] <- last.afth.used
+      }
+    }
+  }
+
+  mcorr$th[which(is.na(mcorr$th))] <- last.afth.used
+  mcorr$th[which(mcorr$th==1)] <- NA
+
+  vafth_by_bin_corr <- full_join(suffix = c('.old','.corr'),x = m, y = mcorr, by=c('bin','spec','vaf.gtz','vaf.etz','card')) %>%
+    select(bin,spec,th.old,th.corr,vaf.gtz,vaf.etz,card) %>%
+    rename(th = th.old) %>%
+    mutate(changed = if_else(th != th.corr,TRUE,FALSE))
+
+  rownames(vafth_by_bin_corr) <- vafth_by_bin_corr$bin
+  vafth_by_bin_corr <- vafth_by_bin_corr[vafth_by_bin$bin,]
+
+  barplot(vafth_by_bin_corr$th)
+  barplot(vafth_by_bin_corr$th.corr)
+
+
+  # # correct the AF threhsold in bin where there is Inf as limit
+  # N = length(minaf_cov_corrected)
+  # minaf_cov_corrected[N] <- minaf_cov_corrected[N-1]
+  #
+}
+
 
 # [ call snvs ]
 # replicas = 1000
@@ -213,7 +310,7 @@ vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 # mincovgerm = 10
 # maxafgerm = 0.2
 
-vaf.th = vafth_by_bin
+vaf.th = vafth_by_bin %>% select(-vaf.gtz,-vaf.etz)
 # vaf.th = vafth
 spec = 0.995
 min.cov = 10
