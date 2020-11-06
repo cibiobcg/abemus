@@ -181,8 +181,6 @@ covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
               include.lowest=TRUE)
 
-# barplot(table(covbin),las=2,cex.names = 0.4)
-
 bin_vafth <- function(bin,vaf,covbin,spec){
 
   vaf.thbin <- data.frame(bin=bin,
@@ -192,20 +190,16 @@ bin_vafth <- function(bin,vaf,covbin,spec){
                           vaf.etz=length(which(vaf[which(covbin == bin)] == 0)),
                           stringsAsFactors = FALSE)
 
+  vaf.thbin <- mutate(vaf.thbin, card = vaf.gtz + vaf.etz)
   return(vaf.thbin)
 }
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 
-# par(mfrow=c(3,1))
-# x <- vafth_by_bin[which(vafth_by_bin$spec == 0.995),]
-# barplot(table(covbin),las=2,cex.names = 0.4)
-# barplot(rbind(x$vaf.gtz,x$vaf.etz),beside = TRUE,names.arg = x$bin,cex.names = 0.4,las=2)
-# barplot(x$th,names.arg = x$bin,cex.names = 0.4,las=2)
-
 # [ adjust vafth_by_bin ]
-get_afth <- function(num,idx,next.bin.AFgtz,next.bin.AFetz,vaf,det.spec){
-  afth <- quantile.zaf(x = vaf[sample(x = idx,size = next.bin.AFgtz,replace = FALSE)],
+
+get_afth <- function(num,next.bin.AFgtz,next.bin.AFetz,vaf.gtz){
+  afth <- quantile.zaf(x = sample(vaf.gtz, size = next.bin.AFgtz, replace = FALSE),
                        probs = det.spec,
                        nz = next.bin.AFetz)
   return(data.frame(spec=det.spec,
@@ -213,30 +207,30 @@ get_afth <- function(num,idx,next.bin.AFgtz,next.bin.AFetz,vaf,det.spec){
                     stringsAsFactors = FALSE))
 }
 
-adjust_vafth_by_bin <- function(vafth_by_bin,vaf,covbin,replicas=10,replicas.in.parallel){
-  m <- arrange(vafth_by_bin, desc(vaf.gtz),desc(vaf.etz)) %>% mutate(card = vaf.gtz + vaf.etz)
+adjust_vafth_by_bin <- function(det.spec,vafth_by_bin,vaf,covbin,coeffvar.th=0.001,replicas=100,replicas.in.parallel=2){
+
+  m <- vafth_by_bin %>%
+    filter(spec == det.spec) %>%
+    arrange(desc(vaf.gtz),desc(vaf.etz))
+
   stop <- nrow(m)-1
   last.stable.card <- 0
   tab <- c()
-  det.spec <- as.numeric(unique(m$spec))
+
   for(i in 1:stop){
     current.bin <- m$bin[i]
     current.bin.card <- m$card[i]
+
+    vaf.gtz <- vaf[which(covbin == current.bin)]
+    vaf.gtz <- vaf.gtz[which(vaf.gtz > 0)]
+
     if(current.bin.card >= last.stable.card){
       for(j in (i+1):(stop+1)){
         next.bin <- m$bin[j]
         next.bin.card <- m$card[j]
         next.bin.AFetz <- m$vaf.etz[j]
         next.bin.AFgtz <- m$vaf.gtz[j]
-        idx <- which(covbin == current.bin)
-        out <- mclapply(1:replicas,
-                       get_afth,
-                       idx=idx,
-                       next.bin.AFgtz=next.bin.AFgtz,
-                       next.bin.AFetz=next.bin.AFetz,
-                       vaf=vaf,
-                       det.spec=det.spec,
-                       mc.cores = replicas.in.parallel)
+        out <- mclapply(1:replicas,get_afth, next.bin.AFgtz, next.bin.AFetz, vaf.gtz, mc.cores = replicas.in.parallel)
         ReplicasTable <- do.call(rbind,out)
         coeffvar <- as.numeric(sd(ReplicasTable$th,na.rm=TRUE)/mean(ReplicasTable$th,na.rm=TRUE))
         if(is.na(coeffvar)){
@@ -249,7 +243,7 @@ adjust_vafth_by_bin <- function(vafth_by_bin,vaf,covbin,replicas=10,replicas.in.
                        last.stable.card=last.stable.card,
                        stringsAsFactors = FALSE)
         tab=rbind(tab,x)
-        if(coeffvar > coeffvar.threshold){
+        if(coeffvar > coeffvar.th){
           last.stable.card = max(last.stable.card,next.bin.card)
           break
         }
