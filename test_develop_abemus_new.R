@@ -183,6 +183,27 @@ covbin <- cut(cov,
 
 bin_vafth <- function(bin,vaf,covbin,spec){
 
+  if(TRUE){
+
+    w <- vaf[which(covbin == bin)]
+    rem <- round(length(w) * seq(0.05,0.5,0.05))
+
+
+    vaf.thbin <- c()
+    for(sz in rem){
+
+      this <- data.frame(bin=bin,
+                         spec=spec,
+                         th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
+                         rm=sz,
+                         stringsAsFactors = FALSE)
+
+      vaf.thbin <- rbind(vaf.thbin,this)
+
+    }
+
+  }
+
   vaf.thbin <- data.frame(bin=bin,
                           spec=spec,
                           th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
@@ -206,6 +227,11 @@ get_afth <- function(num,next.bin.AFgtz,next.bin.AFetz,vaf.gtz){
                     th=as.numeric(afth),
                     stringsAsFactors = FALSE))
 }
+
+par(mfrow=c(2,1))
+barplot(rbind(m$vaf.gtz,m$vaf.etz),beside = F)
+barplot(m$th)
+
 
 adjust_vafth_by_bin <- function(det.spec,vafth_by_bin,vaf,covbin,coeffvar.th=0.001,replicas=100,replicas.in.parallel=2){
 
