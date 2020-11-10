@@ -138,7 +138,7 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
 pbem_by_chrom <- lapply(seq_len(length(ref)),chrom_pbem,mat_cov,mat_cov_base,ref)
 
 # [ compute af thresholds ]
-spec <- seq(0.9,1,0.0001)
+spec <- seq(0.9,1,0.001)
 max.vaf <- 0.2
 min.cov <- 10
 bin.cov <- 50
@@ -186,33 +186,57 @@ bin_vafth <- function(bin,vaf,covbin,spec){
   if(TRUE){
 
     w <- vaf[which(covbin == bin)]
-    rem <- round(length(w) * seq(0.05,0.5,0.05))
 
+    vaf.thbin <- data.frame(bin=bin,
+                       spec=spec,
+                       th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
+                       keep=NA,
+                       run=NA,
+                       stringsAsFactors = FALSE)
 
-    vaf.thbin <- c()
-    for(sz in rem){
+    nn <- round(length(w) * seq(0.05,0.9,0.05))
 
-      this <- data.frame(bin=bin,
-                         spec=spec,
-                         th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
-                         rm=sz,
-                         stringsAsFactors = FALSE)
+    for(sz in nn){
 
-      vaf.thbin <- rbind(vaf.thbin,this)
+      for(run in 1:100){
+        this <- data.frame(bin=bin,
+                           spec=spec,
+                           th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
+                           keep=sz,
+                           run=run,
+                           stringsAsFactors = FALSE)
+
+        vaf.thbin <- rbind(vaf.thbin,this)
+      }
 
     }
 
+    vaf.thbin_full <- vaf.thbin %>%
+      filter(is.na(keep)) %>%
+      select(-keep,-run)
+    vaf.thbin_subs <- vaf.thbin %>%
+      filter(!is.na(keep)) %>%
+      group_by(spec) %>%
+      summarise(cvar=sd(th,na.rm=TRUE)/mean(th,na.rm=TRUE))
+
+    vaf.thbin <- full_join(x = vaf.thbin_full,y = vaf.thbin_subs,by='spec')
+
+    return(vaf.thbin)
+
+  } else {
+
+    vaf.thbin <- data.frame(bin=bin,
+                            spec=spec,
+                            th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
+                            vaf.gtz=length(which(vaf[which(covbin == bin)] > 0)),
+                            vaf.etz=length(which(vaf[which(covbin == bin)] == 0)),
+                            stringsAsFactors = FALSE)
+
+    vaf.thbin <- mutate(vaf.thbin, card = vaf.gtz + vaf.etz)
+    return(vaf.thbin)
+
   }
 
-  vaf.thbin <- data.frame(bin=bin,
-                          spec=spec,
-                          th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
-                          vaf.gtz=length(which(vaf[which(covbin == bin)] > 0)),
-                          vaf.etz=length(which(vaf[which(covbin == bin)] == 0)),
-                          stringsAsFactors = FALSE)
-
-  vaf.thbin <- mutate(vaf.thbin, card = vaf.gtz + vaf.etz)
-  return(vaf.thbin)
 }
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
