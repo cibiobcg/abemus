@@ -194,7 +194,7 @@ bin_vafth <- function(bin,vaf,covbin,spec){
                        run=NA,
                        stringsAsFactors = FALSE)
 
-    nn <- round(length(w) * seq(0.05,0.9,0.05))
+    nn <- length(w) - round(length(w) * seq(0.01,0.9,0.01))
 
     for(sz in nn){
 
@@ -214,13 +214,19 @@ bin_vafth <- function(bin,vaf,covbin,spec){
     vaf.thbin_full <- vaf.thbin %>%
       filter(is.na(keep)) %>%
       select(-keep,-run)
+
     vaf.thbin_subs <- vaf.thbin %>%
       filter(!is.na(keep)) %>%
-      group_by(spec) %>%
-      summarise(cvar=sd(th,na.rm=TRUE)/mean(th,na.rm=TRUE))
+      group_by(spec,keep) %>%
+      summarise(cvar=sd(th,na.rm=TRUE)/mean(th,na.rm=TRUE),median=median(th,na.rm = TRUE)) %>%
+      arrange(desc(keep))
 
-    vaf.thbin <- full_join(x = vaf.thbin_full,y = vaf.thbin_subs,by='spec')
+    vaf.thbin <- full_join(x = vaf.thbin_full,y = vaf.thbin_subs,by='spec') %>%
+      mutate(delta = abs(median - th))
 
+    # tested only with one spec and one bin
+    ggplot(vaf.thbin, aes(keep, delta)) + geom_bar(stat = 'identity')
+    ggplot(vaf.thbin, aes(delta)) + stat_ecdf(geom = "step")
     return(vaf.thbin)
 
   } else {
