@@ -9,6 +9,8 @@ library(dplyr)
 library(tidyr)
 library(readr)
 library(stringr)
+library(gridExtra)
+library(ggplot2)
 
 sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
 pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
@@ -181,24 +183,24 @@ covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
               include.lowest=TRUE)
 
-bin_vafth <- function(bin,vaf,covbin,spec){
+bin_vafth <- function(bin,vaf,covbin,spec=0.995,replica=10){
 
-  if(TRUE){
+  w <- vaf[which(covbin == bin)]
 
-    w <- vaf[which(covbin == bin)]
+  vaf.thbin <- data.frame(bin=bin,
+                     spec=spec,
+                     th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
+                     keep=NA,
+                     run=NA,
+                     stringsAsFactors = FALSE)
 
-    vaf.thbin <- data.frame(bin=bin,
-                       spec=spec,
-                       th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
-                       keep=NA,
-                       run=NA,
-                       stringsAsFactors = FALSE)
+  if( length(w) >= 100 ){
 
-    nn <- length(w) - round(length(w) * seq(0.01,0.9,0.01))
+    nn <- length(w) - round(length(w) * seq(0.01,0.99,0.01))
 
     for(sz in nn){
 
-      for(run in 1:100){
+      for(run in 1:replica){
         this <- data.frame(bin=bin,
                            spec=spec,
                            th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
@@ -225,27 +227,18 @@ bin_vafth <- function(bin,vaf,covbin,spec){
       mutate(delta = abs(median - th))
 
     # tested only with one spec and one bin
-    ggplot(vaf.thbin, aes(keep, delta)) + geom_bar(stat = 'identity')
-    ggplot(vaf.thbin, aes(delta)) + stat_ecdf(geom = "step")
+    p <- ggplot(vaf.thbin, aes(keep, delta)) + geom_bar(stat = 'identity') +
+      ggtitle(bin) +
+      geom_hline(yintercept = 0.001,linetype="dashed", color = "red")
+    print(p)
+
     return(vaf.thbin)
-
-  } else {
-
-    vaf.thbin <- data.frame(bin=bin,
-                            spec=spec,
-                            th=as.numeric(quantile(vaf[which(covbin == bin)],probs = spec,na.rm = TRUE)),
-                            vaf.gtz=length(which(vaf[which(covbin == bin)] > 0)),
-                            vaf.etz=length(which(vaf[which(covbin == bin)] == 0)),
-                            stringsAsFactors = FALSE)
-
-    vaf.thbin <- mutate(vaf.thbin, card = vaf.gtz + vaf.etz)
-    return(vaf.thbin)
-
   }
-
 }
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
+
+barplot(vafth_by_bin$th,names.arg = vafth_by_bin$bin,las=2)
 
 # [ adjust vafth_by_bin ]
 
