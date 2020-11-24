@@ -183,179 +183,102 @@ covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
               include.lowest=TRUE)
 
-bin_vafth <- function(bin,vaf,covbin,spec=0.995,replica=10){
+bin_vafth <- function(bin,vaf,covbin,spec,replica=10){
 
   w <- vaf[which(covbin == bin)]
 
   vaf.thbin <- data.frame(bin=bin,
-                     spec=spec,
-                     th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
-                     keep=NA,
-                     run=NA,
-                     stringsAsFactors = FALSE)
+                          spec=spec,
+                          th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
+                          n=length(w[!is.na(w)]),
+                          n_vaf_gtz=length(w[w > 0]),
+                          n_vaf_etz=length(w[w == 0]),
+                          stringsAsFactors = FALSE)
 
-  if( length(w) >= 100 ){
+  if(FALSE){
+    vaf.thbin <- data.frame(bin=bin,
+                            spec=spec,
+                            th=as.numeric(quantile(w,probs = spec,na.rm = TRUE)),
+                            keep=NA,
+                            run=NA,
+                            stringsAsFactors = FALSE)
 
-    nn <- length(w) - round(length(w) * seq(0.01,0.99,0.01))
+    if( length(w) >= 100 ){
 
-    for(sz in nn){
+      nn <- length(w) - round(length(w) * seq(0.01,0.99,0.01))
 
-      for(run in 1:replica){
-        this <- data.frame(bin=bin,
-                           spec=spec,
-                           th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
-                           keep=sz,
-                           run=run,
-                           stringsAsFactors = FALSE)
+      for(sz in nn){
 
-        vaf.thbin <- rbind(vaf.thbin,this)
+        for(run in 1:replica){
+          this <- data.frame(bin=bin,
+                             spec=spec,
+                             th=as.numeric(quantile(sample(w,size = sz, replace = FALSE),probs = spec,na.rm = TRUE)),
+                             keep=sz,
+                             run=run,
+                             stringsAsFactors = FALSE)
+
+          vaf.thbin <- rbind(vaf.thbin,this)
+        }
+
       }
 
+      vaf.thbin_full <- vaf.thbin %>%
+        filter(is.na(keep)) %>%
+        select(-keep,-run)
+
+      vaf.thbin_subs <- vaf.thbin %>%
+        filter(!is.na(keep)) %>%
+        group_by(spec,keep) %>%
+        summarise(cvar=sd(th,na.rm=TRUE)/mean(th,na.rm=TRUE),median=median(th,na.rm = TRUE)) %>%
+        arrange(desc(keep))
+
+      vaf.thbin <- full_join(x = vaf.thbin_full,y = vaf.thbin_subs,by='spec') %>%
+        mutate(delta = abs(median - th))
+
+      # tested only with one spec and one bin
+      p <- ggplot(vaf.thbin, aes(keep, delta)) + geom_bar(stat = 'identity') +
+        ggtitle(bin) +
+        geom_hline(yintercept = 0.001,linetype="dashed", color = "red")
+      print(p)
+
+      return(vaf.thbin)
     }
 
-    vaf.thbin_full <- vaf.thbin %>%
-      filter(is.na(keep)) %>%
-      select(-keep,-run)
-
-    vaf.thbin_subs <- vaf.thbin %>%
-      filter(!is.na(keep)) %>%
-      group_by(spec,keep) %>%
-      summarise(cvar=sd(th,na.rm=TRUE)/mean(th,na.rm=TRUE),median=median(th,na.rm = TRUE)) %>%
-      arrange(desc(keep))
-
-    vaf.thbin <- full_join(x = vaf.thbin_full,y = vaf.thbin_subs,by='spec') %>%
-      mutate(delta = abs(median - th))
-
-    # tested only with one spec and one bin
-    p <- ggplot(vaf.thbin, aes(keep, delta)) + geom_bar(stat = 'identity') +
-      ggtitle(bin) +
-      geom_hline(yintercept = 0.001,linetype="dashed", color = "red")
-    print(p)
-
-    return(vaf.thbin)
   }
+
+  return(vaf.thbin)
 }
 
 vafth_by_bin <- do.call(rbind,lapply(levels(covbin),bin_vafth,vaf,covbin,spec))
 
-barplot(vafth_by_bin$th,names.arg = vafth_by_bin$bin,las=2)
+tp <- vafth_by_bin %>%
+  filter(spec == 0.995) %>%
+  mutate(bin = factor(bin,levels = bin)) %>%
+  gather(.,class_vaf,n_vaf,n_vaf_gtz:n_vaf_etz) %>%
+  mutate(class_vaf = ifelse(class_vaf == "n_vaf_gtz", "VAF > 0", "VAF = 0"))
 
-# [ adjust vafth_by_bin ]
+p1 <- ggplot(tp, aes(x=as.factor(bin), y=n_vaf,fill=class_vaf)) +
+  geom_bar(stat="identity") + ylab('VAF count') + xlab('coverage bin') +
+  theme(legend.position = 'top',legend.title = element_blank(),axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-get_afth <- function(num,next.bin.AFgtz,next.bin.AFetz,vaf.gtz){
-  afth <- quantile.zaf(x = sample(vaf.gtz, size = next.bin.AFgtz, replace = FALSE),
-                       probs = det.spec,
-                       nz = next.bin.AFetz)
-  return(data.frame(spec=det.spec,
-                    th=as.numeric(afth),
-                    stringsAsFactors = FALSE))
-}
+p2 <- ggplot(tp %>% select(bin,th) %>% distinct(), aes(x=as.factor(bin), y=th)) +
+  geom_bar(stat="identity") + ylab('VAF threshold') + xlab('coverage bin') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
-par(mfrow=c(2,1))
-barplot(rbind(m$vaf.gtz,m$vaf.etz),beside = F)
-barplot(m$th)
-
-
-adjust_vafth_by_bin <- function(det.spec,vafth_by_bin,vaf,covbin,coeffvar.th=0.001,replicas=100,replicas.in.parallel=2){
-
-  m <- vafth_by_bin %>%
-    filter(spec == det.spec) %>%
-    arrange(desc(vaf.gtz),desc(vaf.etz))
-
-  stop <- nrow(m)-1
-  last.stable.card <- 0
-  tab <- c()
-
-  for(i in 1:stop){
-    current.bin <- m$bin[i]
-    current.bin.card <- m$card[i]
-
-    vaf.gtz <- vaf[which(covbin == current.bin)]
-    vaf.gtz <- vaf.gtz[which(vaf.gtz > 0)]
-
-    if(current.bin.card >= last.stable.card){
-      for(j in (i+1):(stop+1)){
-        next.bin <- m$bin[j]
-        next.bin.card <- m$card[j]
-        next.bin.AFetz <- m$vaf.etz[j]
-        next.bin.AFgtz <- m$vaf.gtz[j]
-        out <- mclapply(1:replicas,get_afth, next.bin.AFgtz, next.bin.AFetz, vaf.gtz, mc.cores = replicas.in.parallel)
-        ReplicasTable <- do.call(rbind,out)
-        coeffvar <- as.numeric(sd(ReplicasTable$th,na.rm=TRUE)/mean(ReplicasTable$th,na.rm=TRUE))
-        if(is.na(coeffvar)){
-          coeffvar <- 0
-        }
-        x = data.frame(current.bin=current.bin,
-                       next.bin=next.bin,
-                       coeffvar=coeffvar,
-                       median.vafth=median(ReplicasTable$th,na.rm = TRUE),
-                       last.stable.card=last.stable.card,
-                       stringsAsFactors = FALSE)
-        tab=rbind(tab,x)
-        if(coeffvar > coeffvar.th){
-          last.stable.card = max(last.stable.card,next.bin.card)
-          break
-        }
-      }
-    }
-  }
-
-  # correct the original threhsold table
-  mcorr <- m
-  cc <- tab$last.stable.card[nrow(tab)]
-
-  last.afth.used <- 1
-  start <- 2
-  end <- length(minaf_cov_corrected)-1
-
-  for(i in start:end){
-    bin.name <- mcorr$bin[i]
-    bin.card <- mcorr$card[which(mcorr$bin == bin.name)]
-    if(!identical(bin.card,numeric(0))){
-      if(bin.card < cc & last.afth.used == 1){
-        mcorr$th[i] <- last.afth.used
-      }
-      if(bin.card >= cc){
-        last.afth.used <- mcorr$th[i]
-      }
-      if(bin.card < cc & last.afth.used != 1){
-        mcorr$th[i] <- last.afth.used
-      }
-    }
-  }
-
-  mcorr$th[which(is.na(mcorr$th))] <- last.afth.used
-  mcorr$th[which(mcorr$th==1)] <- NA
-
-  vafth_by_bin_corr <- full_join(suffix = c('.old','.corr'),x = m, y = mcorr, by=c('bin','spec','vaf.gtz','vaf.etz','card')) %>%
-    select(bin,spec,th.old,th.corr,vaf.gtz,vaf.etz,card) %>%
-    rename(th = th.old) %>%
-    mutate(changed = if_else(th != th.corr,TRUE,FALSE))
-
-  rownames(vafth_by_bin_corr) <- vafth_by_bin_corr$bin
-  vafth_by_bin_corr <- vafth_by_bin_corr[vafth_by_bin$bin,]
-
-  barplot(vafth_by_bin_corr$th)
-  barplot(vafth_by_bin_corr$th.corr)
-
-
-  # # correct the AF threhsold in bin where there is Inf as limit
-  # N = length(minaf_cov_corrected)
-  # minaf_cov_corrected[N] <- minaf_cov_corrected[N-1]
-  #
-}
-
+gA <- ggplotGrob(p1)
+gB <- ggplotGrob(p2)
+maxWidth = grid::unit.pmax(gA$widths[2:5], gB$widths[2:5])
+gA$widths[2:5] <- as.list(maxWidth)
+gB$widths[2:5] <- as.list(maxWidth)
+grid.arrange(gA, gB, ncol=1)
 
 # [ call snvs ]
-# replicas = 1000
-# replicas.in.parallel = 1
-# coeffvar.threshold = 0.01
 # mincovgerm = 10
 # maxafgerm = 0.2
 
 vaf.th = vafth_by_bin %>% select(-vaf.gtz,-vaf.etz)
 # vaf.th = vafth
-spec = 0.995
+det.spec = 0.995
 min.cov = 10
 min.alt = 1
 
