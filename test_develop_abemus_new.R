@@ -1,19 +1,18 @@
 library( devtools )
-devtools::install_github("cibiobcg/abemus", build_vignettes = F)
+devtools::install_github("cibiobcg/abemus", build_vignettes = FALSE)
 
 library(abemus)
 library(data.table)
 library(parallel)
 library(Matrix)
-library(dplyr)
-library(tidyr)
-library(readr)
-library(stringr)
+library(tidyverse)
 library(gridExtra)
-library(ggplot2)
 
-sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
-pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
+# sample.info.file <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/sif.txt"
+# pacbam <- "/BCGLAB/ncasiraghi/abemus_test_develop_branch/pacbam"
+
+sample.info.file <- "/Users/ncasiraghi/Documents/abemus_datasets/test_dataset_Snv0.01/test_sif_new.tsv"
+pacbam <- "/Users/ncasiraghi/Documents/abemus_datasets/test_dataset_Snv0.01/pacbam_data_new"
 
 chroms <- c(1:22,'X','Y')
 
@@ -25,7 +24,7 @@ read.sif <- function(file){
     sif$ctrl <- sif$ctrl
   } else{
     sif$case <- gsub(unique(basename(tsv[,1])),pattern = '\\.bam$',replacement = '')
-    sif$ctrl <- gsub(unique(basename(tsv[,2])),pattern = '\\.bam$',replacement = '')
+    sif$ctrl <- gsub(basename(tsv[,2]),pattern = '\\.bam$',replacement = '')
   }
   return(sif)
 }
@@ -49,7 +48,7 @@ get_loci <- function(chr,pacbam,select='ref',nThread=4){
 }
 
 pileup2mat <- function(chr,sif,pacbam,select,sparse=FALSE,nThread=4){
-  id <- paste0(sif$ctrl,paste0('_chr',chr),'.pileup')
+  id <- paste0(unique(na.omit(sif$ctrl)),paste0('_chr',chr),'.pileup')
   ff <- file.path(pacbam,id)
   ff <- ff[which(file.exists(ff))]
   if(length(ff) == 0){
@@ -111,8 +110,6 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref){
 
   den <- rowSums(mat_cov_chr,na.rm = TRUE)
 
-  # hist(den)
-
   ext <- function(lst,n){
     sapply(lst,FUN = '[',n)
   }
@@ -165,11 +162,7 @@ cov_vaf_by_chrom <- lapply(seq_len(length(ref)),chrom_cov_vaf,mat_cov,mat_vaf,rs
 
 # vaf threshold not cov based
 
-ext <- function(lst,n){
-  sapply(lst,FUN = '[',n)
-}
-
-vaf <- as.vector(unlist(ext(cov_vaf_by_chrom,2)))
+vaf <- as.vector(unlist(lapply(cov_vaf_by_chrom,`[`,2)))
 
 vafth <- data.frame(spec=spec,
                     th=as.numeric(quantile(vaf,probs = spec,na.rm = TRUE)),
@@ -177,7 +170,7 @@ vafth <- data.frame(spec=spec,
 
 # vaf threshold cov based
 
-cov <- as.vector(unlist(ext(cov_vaf_by_chrom,1)))
+cov <- as.vector(unlist(lapply(cov_vaf_by_chrom,`[`,1)))
 
 covbin <- cut(cov,
               breaks=seq(min.cov,max(cov,na.rm = TRUE),by=bin.cov),
@@ -276,14 +269,18 @@ grid.arrange(gA, gB, ncol=1)
 # mincovgerm = 10
 # maxafgerm = 0.2
 
-vaf.th = vafth_by_bin %>% select(-vaf.gtz,-vaf.etz)
+vaf.th = vafth_by_bin %>% select(bin,spec,th)
 # vaf.th = vafth
 det.spec = 0.995
 min.cov = 10
 min.alt = 1
+min.cov.ctrl = 10
+max.vaf.ctrl = 0.2
 
-callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995,min.cov=10,min.alt=1,nThread=4){
-  id <- paste0(case,paste0('_chr',chr),'.pabs')
+callsnvs_tmp <- function(chr,idx,pacbam,vaf.th,pos,pbem_by_chrom,
+                         det.spec=0.995,min.cov=10,min.alt=1,
+                         mat_vaf=mat_vaf,mat_cov=mat_cov,min.cov.ctrl=10,max.vaf.ctrl=0.2,nThread=4){
+  id <- paste0(sif$case[idx],paste0('_chr',chr),'.pabs')
   ff <- file.path(pacbam,id)
   if(!file.exists(ff)){
     return(NA)
@@ -299,6 +296,29 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
 
     # filter based on cov
     snvs <- do.call(rbind,lapply(seq_len(nrow(df)),CheckAltReads,df)) %>% filter(cov.alt >= min.alt)
+
+    # filter based on matched ctrl [if available]-------------------------------
+
+    # index for chr
+    j <- which(chr==c(1:22,'X','Y'))
+
+    if(!is.na(sif$ctrl[idx])){
+
+      # index for pos
+      pos.index <- which(pos[[j]] %in% df$pos)
+
+      # index for ctrl
+      ctrl.index <- which(unique(sif$ctrl) == sif$ctrl[idx])
+
+      # add info to snvs table
+
+      snvs <- snvs %>%
+        mutate(vaf.ctrl = as.numeric(mat_vaf[[j]][pos.index,ctrl.index]),
+               cov.ctrl = as.numeric(mat_cov[[j]][pos.index,ctrl.index])) %>%
+        filter(cov.ctrl >= min.cov.ctrl,
+               vaf.ctrl <= max.vaf.ctrl)
+
+    }
 
     # filter based on vaf
     if(ncol(vaf.th)==2){
@@ -323,7 +343,6 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
     }
 
     # filter based on pbem
-    j <- which(chr==c(1:22,'X','Y'))
     snvs$pbem <- pbem_by_chrom[[j]][which(pos[[j]] %in% snvs$pos)]
 
     snvs <- snvs %>% drop_na(pbem)
@@ -339,10 +358,18 @@ callsnvs_tmp <- function(chr,case,pacbam,vaf.th,pos,pbem_by_chrom,det.spec=0.995
   }
 }
 
-snvs <-list()
-for(case in sif$case){
-  message(case)
-  snvs[[case]] <- do.call(rbind,mclapply(chroms,callsnvs_tmp,case,pacbam,vaf.th,pos,pbem_by_chrom,mc.cores = 4))
+snvs_list <-list()
+for(idx in seq_len(length(sif$case))){
+  message(sif$case[idx])
+  snvs_list[[sif$case[idx]]] <- do.call(rbind,mclapply(chroms,callsnvs_tmp,
+                                                       mat_vaf=mat_vaf,
+                                                       mat_cov=mat_cov,
+                                                       idx=idx,
+                                                       pacbam=pacbam,
+                                                       vaf.th=vaf.th,
+                                                       pos=pos,
+                                                       pbem_by_chrom=pbem_by_chrom,
+                                                       mc.cores = 4))
 }
 
 
