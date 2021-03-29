@@ -1,5 +1,5 @@
 library( devtools )
-devtools::install_github("cibiobcg/abemus", build_vignettes = FALSE)
+devtools::install_github("cibiobcg/abemus", build_vignettes = FALSE, ref = "develop")
 
 library(abemus)
 library(data.table)
