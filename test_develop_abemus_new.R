@@ -372,5 +372,3 @@ for(idx in seq_len(length(sif$case))){
                                                        mc.cores = 4))
 }
 
-
-
