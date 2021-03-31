@@ -56,7 +56,7 @@ apply_scaling_factor <- function(tabindex,
       a <- a[which(a$pass.filter.pbem_coverage==1),]
       out.name <- gsub(basename(tabindex$tabcalls_f3[i]),pattern = "pmtab_F3_",replacement = paste0("pmtab_F3_optimalR_"))
       out.path <- gsub(tabindex$tabcalls_f3[i],pattern = basename(tabindex$tabcalls_f3[i]),replacement = out.name)
-      #write.table(x = a,file = out.path,quote = FALSE,sep = "\t",row.names = FALSE,col.names = TRUE)
+      write.table(x = a,file = out.path,quote = FALSE,sep = "\t",row.names = FALSE,col.names = TRUE)
       tabindex[i,paste0("tabcalls_f3","_optimalR")] <- out.path
       tabindex[i,paste0("tabcalls_f3","_optimalR_used")] <- optR
     }
@@ -74,7 +74,7 @@ apply_scaling_factor <- function(tabindex,
       a <- a[which(a$pass.filter.pbem_coverage==1),]
       out.name <- gsub(basename(tabindex$tabcalls_f3[i]),pattern = "pmtab_F3_",replacement = paste0("pmtab_F3_R",R,"_"))
       out.path <- gsub(tabindex$tabcalls_f3[i],pattern = basename(tabindex$tabcalls_f3[i]),replacement = out.name)
-      #write.table(x = a,file = out.path,quote = FALSE,sep = "\t",row.names = FALSE,col.names = TRUE)
+      write.table(x = a,file = out.path,quote = FALSE,sep = "\t",row.names = FALSE,col.names = TRUE)
       tabindex[i,paste0("tabcalls_f3","_R",R)] <- out.path
     }
     message(paste("[",Sys.time(),"]\talright."))
