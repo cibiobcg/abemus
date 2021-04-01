@@ -22,7 +22,9 @@ compute_afthreshold <- function(outdir,
   message(paste("[",Sys.time(),"]\tEstimation of AF thresolds exploiting germline samples only"))
 
   if(!file.exists(file.path(outdir, outdir.afth.name))){
-    dir.create(file.path(outdir, outdir.afth.name), showWarnings = TRUE)
+    dir.create(file.path(outdir, outdir.afth.name), showWarnings = FALSE)
+  } else{
+    file.remove(list.files(file.path(outdir, outdir.afth.name), full.names = TRUE))
   }
   setwd(file.path(outdir, outdir.afth.name))
 
