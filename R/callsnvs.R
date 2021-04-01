@@ -60,7 +60,8 @@ callsnvs <- function(sample.info.file,
   if(!file.exists(file.path(outdir, outdir.calls.name))){
     dir.create(file.path(outdir, outdir.calls.name), showWarnings = FALSE)
   } else{
-    file.remove(list.files(file.path(outdir, outdir.calls.name), full.names = TRUE))
+    unlink(file.path(outdir, outdir.calls.name),recursive = TRUE)
+    dir.create(file.path(outdir, outdir.calls.name), showWarnings = FALSE)
   }
 
   # compute minaf_cov_corrected
