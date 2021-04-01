@@ -58,7 +58,9 @@ callsnvs <- function(sample.info.file,
 
   message(paste("[",Sys.time(),"]\tDetection of somatic SNVs in case samples"))
   if(!file.exists(file.path(outdir, outdir.calls.name))){
-    dir.create(file.path(outdir, outdir.calls.name), showWarnings = TRUE)
+    dir.create(file.path(outdir, outdir.calls.name), showWarnings = FALSE)
+  } else{
+    file.remove(list.files(file.path(outdir, outdir.calls.name), full.names = TRUE))
   }
 
   # compute minaf_cov_corrected
