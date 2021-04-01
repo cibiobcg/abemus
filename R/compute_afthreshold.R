@@ -23,9 +23,6 @@ compute_afthreshold <- function(outdir,
 
   if(!file.exists(file.path(outdir, outdir.afth.name))){
     dir.create(file.path(outdir, outdir.afth.name), showWarnings = FALSE)
-  } else{
-    unlink(file.path(outdir, outdir.afth.name),recursive = TRUE)
-    dir.create(file.path(outdir, outdir.afth.name), showWarnings = FALSE)
   }
   setwd(file.path(outdir, outdir.afth.name))
 
