@@ -47,7 +47,7 @@ compute_pbem <- function(sample.info.file,
   message(paste("[",Sys.time(),"]\tComputation of per-base error model"))
 
   if(!file.exists(file.path(outdir, outdir.bperr.name))){
-    dir.create(file.path(outdir, outdir.bperr.name), showWarnings = TRUE)
+    dir.create(file.path(outdir, outdir.bperr.name), showWarnings = FALSE)
   } else{
     file.remove(list.files(file.path(outdir, outdir.bperr.name), full.names = TRUE))
   }
