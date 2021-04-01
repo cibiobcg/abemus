@@ -48,6 +48,8 @@ compute_pbem <- function(sample.info.file,
 
   if(!file.exists(file.path(outdir, outdir.bperr.name))){
     dir.create(file.path(outdir, outdir.bperr.name), showWarnings = TRUE)
+  } else{
+    file.remove(list.files(file.path(outdir, outdir.bperr.name), full.names = TRUE))
   }
   setwd(file.path(outdir, outdir.bperr.name))
 
