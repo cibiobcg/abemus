@@ -9,11 +9,7 @@ Platform specific and data informed detection of somatic SNVs in cfDNA
 
 ##### 1. [Install](https://github.com/cibiobcg/abemus/wiki/Installation) `abemus` R package:
 ```R
-# from CRAN
-install.packages('abemus')
-
-# from github
-library( "devtools" )
-devtools::install_github("cibiobcg/abemus", build_vignettes = T)
+library( devtools )
+devtools::install_github("cibiobcg/abemus", build_vignettes = FALSE, ref = "develop")
 ```
 ##### 2. Explore `abemus` utilities by following [Usage](https://github.com/cibiobcg/abemus/wiki/Usage) steps as reported in the [example workflow](https://github.com/cibiobcg/abemus/blob/master/test_example.R).
