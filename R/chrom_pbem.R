@@ -1,4 +1,4 @@
-chrom_pbem <- function(i,mat_cov,mat_cov_base,ref,max.vaf.pbem = 0.2,cov.min.pbem = 10){
+chrom_pbem <- function(i,mat_cov,mat_vaf,mat_cov_base,ref,max.vaf.pbem,cov.min.pbem){
 
   if(all(is.na(ref[[i]]))){
     return(NA)
@@ -16,7 +16,7 @@ chrom_pbem <- function(i,mat_cov,mat_cov_base,ref,max.vaf.pbem = 0.2,cov.min.pbe
   den <- rowSums(mat_cov_chr,na.rm = TRUE)
 
   ext <- function(lst,n){
-    sapply(lst,FUN = '[',n)
+    sapply(lst,FUN = `[`,n)
   }
 
   get_num <- function(alt,idx,filtout){

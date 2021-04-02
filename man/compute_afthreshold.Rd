@@ -4,9 +4,13 @@
 \alias{compute_afthreshold}
 \title{Compute coverage-based and not-coverage-based allelic fraction thresholds}
 \usage{
-compute_afthreshold(outdir, pbem_dir = file.path(outdir,
-  "BaseErrorModel"), outdir.afth.name = "Controls",
-  coverage_binning = 50, probs = seq(0.9, 1, 1e-04))
+compute_afthreshold(
+  outdir,
+  pbem_dir = file.path(outdir, "BaseErrorModel"),
+  outdir.afth.name = "Controls",
+  coverage_binning = 50,
+  probs = seq(0.9, 1, 1e-04)
+)
 }
 \arguments{
 \item{outdir}{The folder where outputs will be saved.}

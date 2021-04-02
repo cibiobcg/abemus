@@ -1,4 +1,4 @@
-library( devtools )
+library(devtools)
 devtools::install_github("cibiobcg/abemus", build_vignettes = FALSE, ref = "develop")
 
 library(abemus)
@@ -13,23 +13,13 @@ pacbam <- "/Users/nicola_casiraghi/abemus_tests/dataset_dave/pacbam_data_bychrom
 
 # workflow
 
-sif <- read.sif(samples.info.file)
+# [ import data ]
 
-ref <- lapply(c(1:22,'X','Y'),getLoci,pacbam,select = 'ref')
-pos <- lapply(c(1:22,'X','Y'),getLoci,pacbam,select = 'pos')
-rsid<- lapply(c(1:22,'X','Y'),getLoci,pacbam,select = 'rsid') %>% lapply(function(x) which(!is.na(x)))
-
-mat_vaf <- lapply(c(1:22,'X','Y'),pileup2mat,sif,pacbam,select='af',sparse=TRUE)
-
-mat_cov <- lapply(c(1:22,'X','Y'),pileup2mat,sif,pacbam,select='cov',sparse=FALSE)
-
-mat_cov_base <- list()
-for(base in c('A','C','G','T')){
-  mat_cov_base[[base]] <- lapply(chroms,pileup2mat,sif,pacbam,select=base,sparse=TRUE)
-}
+data <- importData(samples.info.file,pacbam)
 
 # [ compute pbem ]
-pbem_by_chrom <- lapply(seq_len(length(ref)),chrom_pbem,mat_cov,mat_cov_base,ref,max.vaf.pbem = 0.2,cov.min.pbem = 10)
+
+pbem_by_chrom <- getPbem(data)
 
 # [ compute vaf thresholds ]
 

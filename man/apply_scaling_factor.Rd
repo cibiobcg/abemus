@@ -4,8 +4,7 @@
 \alias{apply_scaling_factor}
 \title{Apply the scaling factor R to get the most suitable locus-specific AF threshold.}
 \usage{
-apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE,
-  target_size = NA)
+apply_scaling_factor(tabindex, R = 1, use.optimal.R = FALSE, target_size = NA)
 }
 \arguments{
 \item{tabindex}{The data.frame output from the \code{callsnvs} function. (if use.optimal.R = TRUE , tabindex must contain the column "case_mean_coverage"; use get_case_mean_coverage())}

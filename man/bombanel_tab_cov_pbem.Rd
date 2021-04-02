@@ -4,7 +4,9 @@
 \name{bombanel_tab_cov_pbem}
 \alias{bombanel_tab_cov_pbem}
 \title{[data] Matrix of pbem thresholds}
-\format{An object of class \code{matrix} with 1999 rows and 218 columns.}
+\format{
+An object of class \code{matrix} (inherits from \code{array}) with 1999 rows and 218 columns.
+}
 \usage{
 bombanel_tab_cov_pbem
 }

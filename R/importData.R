@@ -1,0 +1,27 @@
+importData <- function(samples.info.file,pacbam){
+
+  chroms <- c(1:22,'X','Y')
+
+  sif <- read.sif(samples.info.file)
+
+  ref <- lapply(chroms,getLoci,pacbam,select = 'ref')
+  pos <- lapply(chroms,getLoci,pacbam,select = 'pos')
+  rsid<- lapply(chroms,getLoci,pacbam,select = 'rsid') %>% lapply(function(x) which(!is.na(x)))
+
+  mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=TRUE)
+  mat_cov <- lapply(chroms,pileup2mat,sif,pacbam,select='cov',sparse=FALSE)
+
+  mat_cov_base <- list()
+  for(base in c('A','C','G','T')){
+    mat_cov_base[[base]] <- lapply(c(1:22,'X','Y'),pileup2mat,sif,pacbam,select=base,sparse=TRUE)
+  }
+
+  return(list(sif=sif,
+              ref=ref,
+              pos=pos,
+              rsid=rsid,
+              mat_vaf=mat_vaf,
+              mat_cov=mat_cov,
+              mat_cov_base=mat_cov_base))
+
+}

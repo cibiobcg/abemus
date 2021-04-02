@@ -4,7 +4,9 @@
 \name{bombanel_covs}
 \alias{bombanel_covs}
 \title{[data] Coverage levels from simulated data}
-\format{An object of class \code{numeric} of length 1999.}
+\format{
+An object of class \code{numeric} of length 1999.
+}
 \usage{
 bombanel_covs
 }
