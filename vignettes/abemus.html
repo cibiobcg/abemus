@@ -1,22 +1,69 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Nicola Casiraghi" />
 
-<meta name="date" content="2019-11-28" />
+<meta name="date" content="2021-04-02" />
 
 <title>abemus</title>
 
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -119,9 +166,6 @@ font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
 }
-#header {
-text-align: center;
-}
 #TOC {
 clear: both;
 margin: 0 0 10px 10px;
@@ -211,7 +255,7 @@ pre, code {
 background-color: #f7f7f7;
 border-radius: 3px;
 color: #333;
-white-space: pre-wrap;
+white-space: pre-wrap; 
 }
 pre {
 border-radius: 3px;
@@ -279,17 +323,18 @@ text-decoration: underline; }
 a[href^="https:"] {
 text-decoration: underline; }
 
-code > span.kw { color: #555; font-weight: bold; }
-code > span.dt { color: #902000; }
-code > span.dv { color: #40a070; }
-code > span.bn { color: #d14; }
-code > span.fl { color: #d14; }
-code > span.ch { color: #d14; }
-code > span.st { color: #d14; }
-code > span.co { color: #888888; font-style: italic; }
-code > span.ot { color: #007020; }
-code > span.al { color: #ff0000; font-weight: bold; }
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; }
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -304,7 +349,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">abemus</h1>
 <h4 class="author">Nicola Casiraghi</h4>
-<h4 class="date">2019-10-07</h4>
+<h4 class="date">2021-04-02</h4>
 
 
 
@@ -430,7 +475,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <a class="sourceLine" id="cb7-11" data-line-number="11"></a>
 <a class="sourceLine" id="cb7-12" data-line-number="12">calls<span class="op">$</span>tabsnvs_index_scalfact &lt;-<span class="st"> </span><span class="kw">apply_scaling_factor</span>(<span class="dt">tabindex =</span> tabindex,</a>
 <a class="sourceLine" id="cb7-13" data-line-number="13">                                                     <span class="dt">target_size =</span> target_size,</a>
-<a class="sourceLine" id="cb7-14" data-line-number="14">                                                     <span class="dt">use.optimal.R =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb7-14" data-line-number="14">                                                     <span class="dt">use.optimal.R =</span> <span class="ot">TRUE</span>)</a>
 <a class="sourceLine" id="cb7-15" data-line-number="15"></a>
 <a class="sourceLine" id="cb7-16" data-line-number="16"><span class="kw">head</span>( calls<span class="op">$</span>tabsnvs_index_scalfact )</a>
 <a class="sourceLine" id="cb7-17" data-line-number="17"></a>

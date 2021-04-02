@@ -2,8 +2,10 @@
 
 export(apply_scaling_factor)
 export(compute_afthreshold)
+export(getPbem)
 export(get_case_mean_coverage)
 export(get_target_size)
+export(importData)
 import(parallel)
 import(stats)
 import(utils)
