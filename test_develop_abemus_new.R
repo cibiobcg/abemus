@@ -8,12 +8,12 @@ library(Matrix)
 library(tidyverse)
 library(gridExtra)
 
-sample.info.file <- "/Users/nicola_casiraghi/abemus_tests/dataset_dave/sif.tsv"
+samples.info.file <- "/Users/nicola_casiraghi/abemus_tests/dataset_dave/sif.tsv"
 pacbam <- "/Users/nicola_casiraghi/abemus_tests/dataset_dave/pacbam_data_bychrom/"
 
 # workflow
 
-sif <- read.sif(sample.info.file)
+sif <- read.sif(samples.info.file)
 
 ref <- lapply(c(1:22,'X','Y'),getLoci,pacbam,select = 'ref')
 pos <- lapply(c(1:22,'X','Y'),getLoci,pacbam,select = 'pos')
