@@ -1,6 +1,6 @@
 chrom_pbem <- function(i,mat_cov,mat_vaf,mat_cov_base,ref,max.vaf.pbem,cov.min.pbem){
 
-  if(all(is.na(ref[[i]]))){
+  if(is.logical(ref[[i]])){
     return(NA)
   }
 
@@ -37,4 +37,5 @@ chrom_pbem <- function(i,mat_cov,mat_vaf,mat_cov_base,ref,max.vaf.pbem,cov.min.p
   }
 
   return(x)
+
 }

@@ -1,4 +1,4 @@
-chrom_cov_vaf <- function(i,mat_cov,mat_vaf,rsid,max.vaf=0.2,min.cov=10){
+chrom_cov_vaf <- function(i,mat_cov,mat_vaf,rsid,max.vaf,min.cov){
 
   if(all(is.na(mat_cov[[i]]))){
     return(list(NA,NA))
