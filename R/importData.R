@@ -13,12 +13,12 @@ importData <- function(samples.info.file,pacbam){
   pos <- lapply(chroms,getLoci,pacbam,select = 'pos')
   rsid<- lapply(chroms,getLoci,pacbam,select = 'rsid') %>% lapply(function(x) which(!is.na(x)))
 
-  mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=TRUE)
+  mat_vaf <- lapply(chroms,pileup2mat,sif,pacbam,select='af',sparse=FALSE)
   mat_cov <- lapply(chroms,pileup2mat,sif,pacbam,select='cov',sparse=FALSE)
 
   mat_cov_base <- list()
   for(base in c('A','C','G','T')){
-    mat_cov_base[[base]] <- lapply(c(1:22,'X','Y'),pileup2mat,sif,pacbam,select=base,sparse=TRUE)
+    mat_cov_base[[base]] <- lapply(c(1:22,'X','Y'),pileup2mat,sif,pacbam,select=base,sparse=FALSE)
   }
 
   return(list(sif=sif,
