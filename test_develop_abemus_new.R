@@ -23,7 +23,7 @@ pbem_by_chrom <- getPbem(data)
 
 # [ compute vaf thresholds ]
 
-cov_vaf_by_chrom <- lapply(seq_len(length(ref)),chrom_cov_vaf,mat_cov,mat_vaf,rsid,max.vaf=0.2,min.cov=10)
+cov_vaf_by_chrom <- getCovaf(data)
 
 # vaf threshold not cov based
 
