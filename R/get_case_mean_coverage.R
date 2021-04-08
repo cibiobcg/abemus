@@ -1,18 +1,3 @@
-#' Compute the mean coverage of a CASE sample
-#' @param tabindex The data.frame output by the \code{callsnvs} function.
-#' @param pacbamfolder_bychrom The folder popluted by outputs by the \code{split_pacbam_bychrom} function.
-#' @return The \code{sample.info.file} with an additional column reporting the mean coverage for each case (only for those with a matched-CONTROL)
-#' @export
-#' @examples
-#' sample.info.file <- system.file("extdata", "test_sif_toy.tsv", package = "abemus")
-#' outdir <- tempdir()
-#' targetbed <- system.file("extdata", "regions_toy.bed", package = "abemus")
-#' pacbamfolder_bychrom <- system.file("extdata", "pacbam_data_bychrom", package = "abemus")
-#' pbem_dir <- system.file("extdata", "BaseErrorModel", package = "abemus")
-#' controls_dir <- system.file("extdata", "Controls", package = "abemus")
-#' m<-callsnvs(sample.info.file,outdir,targetbed,pbem_dir,controls_dir,pacbamfolder_bychrom,replicas=1)
-#' tabindex <- m$tabsnvs_index
-#' tabindex <- get_case_mean_coverage(tabindex = tabindex,pacbamfolder_bychrom = pacbamfolder_bychrom)
 get_case_mean_coverage <- function(tabindex,
                                    pacbamfolder_bychrom){
 

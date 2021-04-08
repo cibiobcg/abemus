@@ -1,7 +1,7 @@
 #' Compute the per-base error model
-#' @param data Output from \code{importData()} function.
-#' @param max.vaf.pbem Threshold on VAF.
-#' @param cov.min.pbem Threshold on coverage.
+#' @param data The output from \code{importData()} function.
+#' @param max.vaf.pbem Threshold on VAF. default: 0.2
+#' @param cov.min.pbem Threshold on coverage. default: 10
 #' @return A list with pbem values split by chromosome.
 #' @export
 getPbem <- function(data,max.vaf.pbem = 0.2,cov.min.pbem = 10){

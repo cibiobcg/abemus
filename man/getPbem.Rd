@@ -7,11 +7,11 @@
 getPbem(data, max.vaf.pbem = 0.2, cov.min.pbem = 10)
 }
 \arguments{
-\item{data}{Output from \code{importData()} function.}
+\item{data}{The output from \code{importData()} function.}
 
-\item{max.vaf.pbem}{Threshold on VAF.}
+\item{max.vaf.pbem}{Threshold on VAF. default: 0.2}
 
-\item{cov.min.pbem}{Threshold on coverage.}
+\item{cov.min.pbem}{Threshold on coverage. default: 10}
 }
 \value{
 A list with pbem values split by chromosome.
