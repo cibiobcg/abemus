@@ -25,7 +25,7 @@ bed2positions <- function(targetbed,
 
     unwrap <- function(x){return(seq.int(from = x[2],to = x[3]))}
 
-    bed_chrom <- bed[grep(gsub(bed$V1,pattern = 'chr',replacement = ''),pattern = as.character(chrom_to_extract)),,drop=FALSE]
+    bed_chrom <- bed[which(gsub(bed$V1,pattern = 'chr',replacement = '')== as.character(chrom_to_extract)),,drop=FALSE]
 
     PosByChrom <- data.frame(chr=chrom_to_extract,
                              pos=as.numeric(unlist( apply(bed_chrom, MARGIN=1,FUN = unwrap))),
